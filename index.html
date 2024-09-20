@@ -10,6 +10,9 @@
 </head>
 <body>
     <header>
+        <div class="mail-container">
+            <a href="mailto:rejoin-sleek-iron@duck.com"><img class="mail-icon" src="https://img.icons8.com/?size=80&id=OumT4lIcOllS&format=png" alt="Mail Icon"></a>
+        </div>
         <h1>BadLand</h1>
         <div class="coin-container">
             <img class="coin-icon" src="https://img.icons8.com/?size=80&id=sPBQkuep9vDA&format=png" alt="Wallet Icon">
@@ -24,9 +27,8 @@
     </main>
     <footer>
         <div class="button-container">
-            <button>Buton 1</button>
-            <button>Buton 2</button>
-            <button>Buton 3</button>
+            <button onclick="claimDailyBonus()">Günlük Bonus</button>
+            <button onclick="localStorage.removeItem('coins'); location.reload();">Giriş Parası</button>
         </div>
         <p>&copy; 2024 BadLand. Tüm hakları saklıdır.</p>
     </footer>
