@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BadLand - Blackjack</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/styles.css">
+    <script src="assets/script.js"></script>
+    <style>
+        .blackjack {
+            margin: 20px auto;
+            width: 100%;
+            display: grid;
+            grid-template-columns: auto auto;
+        }
+        
+        .blackjack-container {
+            width: 100%;
+        }
+
+        .cards {
+            max-width: 200px;
+            display: flex;
+            margin: 10px 0;
+        }
+
+        .card {
+            width: 50px;
+            height: 70px;
+            border: 2px solid #444;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            margin: 0 5px;
+            background-color: #fff;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>BadLand</h1>
+        <div class="coin-container">
+            <img class="coin-icon" src="https://img.icons8.com/?size=80&id=sPBQkuep9vDA&format=png" alt="Wallet Icon" />
+            <span class="coin-count" id="coin">0</span>
+        </div>
+    </header>
+    <main>
+        <div class="blackjack">
+            <div class="blackjack-container">
+                <h2>Krupiyer Kartları</h2>
+                <div class="cards" id="dealer-cards"></div>
+                <div id="dealer-total">Toplam: 0</div>
+            </div>
+            <div class="blackjack-container">
+                <h2>Oyuncu Kartları</h2>
+                <div class="cards" id="player-cards"></div>
+                <div id="player-total">Toplam: 0</div>
+            </div>
+            <button id="hit-button">Kart Çek</button>
+            <button id="stand-button">Dur</button>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 BadLand. Tüm hakları saklıdır.</p>
+    </footer>
+    <script>
+        const deck = [];
+const playerHand = [];
+const dealerHand = [];
+const cardValues = { '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'J': 10, 'Q': 10, 'K': 10, 'A': 11 };
+let currentBet = 0;
+
+function updateCoins(amount) {
+    const currentCoins = getCoins();
+    const newCoins = currentCoins + amount;
+    const encryptedCoins = encrypt(newCoins.toString());
+    localStorage.setItem('coins', encryptedCoins);
+    document.getElementById('coin').textContent = newCoins; // Güncel miktarı göster
+}
+
+function createDeck() {
+    const suits = ['♥', '♦', '♣', '♠'];
+    const ranks = Object.keys(cardValues);
+    for (const suit of suits) {
+        for (const rank of ranks) {
+            deck.push(rank + suit);
+        }
+    }
+}
+
+function drawCard() {
+    const randomIndex = Math.floor(Math.random() * deck.length);
+    return deck.splice(randomIndex, 1)[0];
+}
+
+function calculateTotal(hand) {
+    let total = 0;
+    let aces = 0;
+    for (const card of hand) {
+        const value = card.slice(0, -1); // Kartın değerini al
+        total += cardValues[value];
+        if (value === 'A') aces++;
+    }
+    while (total > 21 && aces > 0) {
+        total -= 10;
+        aces--;
+    }
+    return total;
+}
+
+function updateUI() {
+    document.getElementById('player-cards').innerHTML = playerHand.map(card => `<div class="card">${card}</div>`).join('');
+    document.getElementById('dealer-cards').innerHTML = dealerHand.map(card => `<div class="card">${card}</div>`).join('');
+    document.getElementById('player-total').textContent = `Toplam: ${calculateTotal(playerHand)}`;
+    document.getElementById('dealer-total').textContent = `Toplam: ${calculateTotal(dealerHand)}`;
+}
+
+function startGame() {
+    createDeck();
+    playerHand.length = 0; // Kartları temizle
+    dealerHand.length = 0; // Kartları temizle
+    playerHand.push(drawCard(), drawCard());
+    dealerHand.push(drawCard(), drawCard());
+    updateUI();
+}
+
+function placeBet() {
+    let currentBet = prompt("Bahis Miktarını girin (100-1000):");
+
+    if (currentBet === null) {
+        window.location.href = "/index.html";
+        return;
+    }
+
+    currentBet = parseInt(currentBet);
+    const coins = getCoins();
+
+    if (isNaN(currentBet) || currentBet < 100 || currentBet > 1000 || currentBet > coins) {
+        alert("Geçersiz bahis miktarı!");
+        window.location.href = "/index.html";
+        return;
+    }
+
+    updateCoins(-currentBet); // Bahisi ilk başta düş
+    startGame();
+}
+
+function disableButtons() {
+    document.getElementById('hit-button').disabled = true;
+    document.getElementById('stand-button').disabled = true;
+}
+
+function resetGame(message) {
+    setTimeout(() => {
+        if (confirm(message + " Tekrar başlatmak ister misiniz?")) {
+            location.reload(); // Sayfayı yenile
+        } else {
+            window.location.href = "/index.html";
+        }
+    }, 1500);
+}
+
+document.getElementById('hit-button').addEventListener('click', () => {
+    playerHand.push(drawCard());
+    updateUI();
+    if (calculateTotal(playerHand) > 21) {
+        disableButtons();
+        resetGame('Kaybettiniz!');
+    }
+});
+
+document.getElementById('stand-button').addEventListener('click', () => {
+    var result = "";
+    while (calculateTotal(dealerHand) < 17) {
+        dealerHand.push(drawCard());
+    }
+    updateUI();
+    const playerTotal = calculateTotal(playerHand);
+    const dealerTotal = calculateTotal(dealerHand);
+
+    if (playerTotal > 21) {
+        updateCoins(-currentBet); // Bahis kaybı
+        result = 'Kaybettiniz!';
+    } else if (dealerTotal > 21 || playerTotal > dealerTotal) {
+        updateCoins(currentBet * 2); // Kazanma durumunda bahis miktarının 2 katı
+        resetGame('Kazandınız!');
+    } else if (playerTotal < dealerTotal) {
+        updateCoins(-currentBet); // Krupiyeye karşı kaybedildi
+        result = 'Kaybettiniz!';
+    } else {
+        updateCoins(currentBet);
+        result = 'Beraberlik!';
+    }
+    disableButtons();
+    resetGame(result);
+});
+
+const coins = getCoins();
+document.getElementById('coin').textContent = coins;
+placeBet();
+    </script>
+</body>
+</html>
