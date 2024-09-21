@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="tr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>BadLand - Bonanza</title>
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="assets/styles.css" />
+        <script src="assets/script.js"></script>
+        <style>
+            main {
+                font-family: "Nunito", sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .game-board {
+                display: grid;
+                grid-template-columns: repeat(8, 30px);
+                grid-template-rows: repeat(8, 30px);
+                gap: 5px;
+            }
+
+            .candy {
+                width: 20px;
+                height: 20px;
+                font-size: 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .empty {
+                background-color: transparent;
+            }
+
+            @keyframes explode {
+                0% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+                50% {
+                    transform: scale(1.5);
+                    opacity: 0.5;
+                }
+                100% {
+                    transform: scale(0);
+                    opacity: 0;
+                }
+            }
+
+            .explode {
+                animation: explode 0.5s forwards;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="mail-container">
+                <a href="mailto:rejoin-sleek-iron@duck.com"><img class="mail-icon" src="https://img.icons8.com/?size=80&id=OumT4lIcOllS&format=png" alt="Mail Icon"></a>
+            </div>
+            <h1>BadLand</h1>
+            <div class="coin-container">
+                <img class="coin-icon" src="https://img.icons8.com/?size=80&id=sPBQkuep9vDA&format=png" alt="Wallet Icon" />
+                <span class="coin-count" id="coin">0</span>
+            </div>
+        </header>
+        <main>
+            <div>
+                <div class="game-board" id="game-board"></div>
+                <button id="restart-btn">Çevir</button>
+            </div>
+        </main>
+        <footer>
+            <p>&copy; 2024 BadLand. Tüm hakları saklıdır.</p>
+        </footer>
+        <script>
+            const board = document.getElementById("game-board");
+            const restartButton = document.getElementById("restart-btn");
+            const boardSize = 8;
+            const candies = ["🍭", "🍬", "🍫", "🍰", "🍡"];
+            let grid = [];
+            let score = 0;
+            const currentCoins = getCoins();
+
+            // Oyun tahtasını oluşturma fonksiyonu
+            function createBoard() {
+                board.innerHTML = ""; // Eski tahtayı temizle
+                grid = []; // Grid'i sıfırla
+                score = 0; // Skoru sıfırla
+
+                for (let i = 0; i < boardSize * boardSize; i++) {
+                    const candy = document.createElement("div");
+                    candy.classList.add("candy");
+                    candy.textContent = candies[Math.floor(Math.random() * candies.length)];
+                    candy.setAttribute("draggable", true);
+                    candy.setAttribute("data-id", i);
+                    board.appendChild(candy);
+                    grid.push(candy);
+                }
+                setTimeout(checkMatches, 100);
+            }
+
+            // Eşleşmeleri kontrol eden fonksiyon
+            function checkMatches() {
+                let matchFound = false; // Eşleşme bulunup bulunmadığını kontrol etmek için
+
+                for (let i = 0; i < grid.length - 2; i++) {
+                    const rowMatch = [i, i + 1, i + 2];
+                    const colMatch = [i, i + boardSize, i + boardSize * 2];
+
+                    if (rowMatch.every((idx) => grid[idx].textContent === grid[i].textContent)) {
+                        matchFound = true;
+                        rowMatch.forEach((idx) => {
+                            grid[idx].classList.add("explode");
+                        });
+                        setTimeout(() => {
+                            rowMatch.forEach((idx) => (grid[idx].className = "candy empty"));
+                        }, 500);
+                        score += 3;
+                    }
+
+                    if (colMatch.every((idx) => grid[idx] && grid[idx].textContent === grid[i].textContent)) {
+                        matchFound = true;
+                        colMatch.forEach((idx) => {
+                            grid[idx].classList.add("explode");
+                        });
+                        setTimeout(() => {
+                            colMatch.forEach((idx) => (grid[idx].className = "candy empty"));
+                        }, 500);
+                        score += 3;
+                    }
+                }
+
+                if (matchFound) {
+                    setTimeout(dropCandies, 500);
+                } else {
+                    endGame();
+                }
+            }
+
+            // Şekerlerin düşme animasyonu
+            function dropCandies() {
+                for (let i = grid.length - 1; i >= boardSize; i--) {
+                    if (grid[i].classList.contains("empty")) {
+                        grid[i].textContent = grid[i - boardSize].textContent;
+                        grid[i - boardSize].className = "candy empty";
+                    }
+                }
+                fillEmptyCandies();
+            }
+
+            // Boş hücreleri doldurma fonksiyonu
+            function fillEmptyCandies() {
+                for (let i = 0; i < grid.length; i++) {
+                    if (grid[i].classList.contains("empty")) {
+                        grid[i].className = "candy";
+                        grid[i].textContent = candies[Math.floor(Math.random() * candies.length)];
+                    }
+                }
+                setTimeout(checkMatches, 100);
+            }
+
+            // Oyun bitiş işlemleri
+            function endGame() {
+                const winnings = score; // Elde edilen skor kazanç olarak alınıyor
+                let coins = getCoins() + winnings; // Mevcut coinlere kazanç ekleniyor
+                localStorage.setItem("coins", encrypt(coins.toString())); // Şifreli olarak localStorage'a kaydediliyor
+                document.getElementById("coin").textContent = coins; // Güncel coin miktarı ekrana yazılıyor
+                alert("Oyun bitti! Kazandığınız coin: " + winnings);
+            }
+
+            // Oyunu başlatma fonksiyonu
+            function startGame() {
+                createBoard();
+                let coins = getCoins() - 50;
+                localStorage.setItem('coins', encrypt(coins.toString())); // Şifreli olarak localStorage'a kaydediliyor
+                document.getElementById('coin').textContent = coins;
+            }
+
+            // Yeniden başlatma butonuna tıklanınca oyunu yeniden başlat
+            restartButton.addEventListener("click", startGame);
+        </script>
+    </body>
+</html>

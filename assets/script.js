@@ -1,3 +1,4 @@
+
 const key = 'mysecretkey';
 
 function encrypt(text) {
@@ -31,7 +32,6 @@ function getCoins() {
     return 0; // Eğer para yoksa 0 döner
 }
 
-// Günlük bonusu al
 // Günlük bonusu al
 function claimDailyBonus() {
     const lastClaimedDate = localStorage.getItem('lastClaimedDate');
