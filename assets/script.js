@@ -32,6 +32,7 @@ function getCoins() {
 }
 
 // Günlük bonusu al
+// Günlük bonusu al
 function claimDailyBonus() {
     const lastClaimedDate = localStorage.getItem('lastClaimedDate');
     const today = new Date().toISOString().split('T')[0]; // Bugünün tarihi
@@ -45,19 +46,12 @@ function claimDailyBonus() {
     
     // Rastgele bir miktar belirle (örneğin 1 ile 100 arasında)
     const random = Math.floor(Math.random() * 100) + 1;
-    
     const newCoins = currentCoins + random;
-    
+    alert(random + " Coin Kazandın");
     // Güncel parayı kaydet
     localStorage.setItem("coins", encrypt(newCoins.toString()));
-    
-    // Güncel miktarı göster
     document.getElementById("coin").textContent = newCoins;
-    
-    // Kullanıcının bonusu aldığını ve tarihi kaydet
     localStorage.setItem('lastClaimedDate', today);
-    
-    // Butonu devre dışı bırak
     document.getElementById("dailyBonusButton").disabled = true;
 }
 
