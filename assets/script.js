@@ -1,71 +1,126 @@
+const games = [
+    { name: "slot", icon: "🎰 ", color: "#3498db" },
+    { name: "rulet", icon: "🎡 ",color: "#e74c3c" },
+    { name: "blackjack", icon: "🃏 ",color: "#2ecc71" },
+    { name: "bonanza", icon: "🍬 ",color: "#f39c12" }
+];
+
+const transactions = [
+    { type: 'win', amount: 5000, game: 'Blackjack' },
+    { type: 'loss', amount: 2000, game: 'Poker' },
+    { type: 'win', amount: 3000, game: 'Slot Machine' },
+    { type: 'loss', amount: 1000, game: 'Roulette' }
+];
 
 const key = 'mysecretkey';
 
 function encrypt(text) {
-    let encrypted = '';
-    for (let i = 0; i < text.length; i++) {
-        encrypted += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
-    }
-    return encrypted;
+    return text.split('').map((char, index) => 
+        String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(index % key.length))
+    ).join('');
 }
 
 function decrypt(encrypted) {
-    return encrypt(encrypted);
+    return encrypt(encrypted); // XOR şifreleme simetrik olduğu için aynı fonksiyon kullanılabilir
 }
 
-// LocalStorage'da para kontrolü ve başlangıç ayarı
 function initializeCoins() {
     const storedCoins = localStorage.getItem('coins');
     if (!storedCoins) {
-        const initialCoins = 100; // Başlangıç parası
+        const initialCoins = 100;
         const encryptedCoins = encrypt(initialCoins.toString());
         localStorage.setItem('coins', encryptedCoins);
     }
 }
 
-// Para miktarını al
 function getCoins() {
     const encryptedCoins = localStorage.getItem('coins');
-    if (encryptedCoins) {
-        return parseInt(decrypt(encryptedCoins), 10);
-    }
-    return 0; // Eğer para yoksa 0 döner
+    return encryptedCoins ? parseInt(decrypt(encryptedCoins), 10) : 0;
 }
 
-// Günlük bonusu al
+function updateCoins(amount) {
+    const currentCoins = getCoins();
+    const newCoins = currentCoins + amount;
+    localStorage.setItem('coins', encrypt(newCoins.toString()));
+    document.getElementById('coin').textContent = newCoins + '$';
+}
+
 function claimDailyBonus() {
     const lastClaimedDate = localStorage.getItem('lastClaimedDate');
-    const today = new Date().toISOString().split('T')[0]; // Bugünün tarihi
+    const today = new Date().toISOString().split('T')[0];
 
     if (lastClaimedDate === today) {
-        alert('Günlük bonusu zaten aldınız!'); // Kullanıcıya bilgi ver
+        alert('Günlük bonusu zaten aldınız!');
         return;
     }
     
-    const currentCoins = getCoins();
-    
-    // Rastgele bir miktar belirle (örneğin 1 ile 100 arasında)
     const random = Math.floor(Math.random() * 100) + 1;
-    const newCoins = currentCoins + random;
+    updateCoins(random);
     alert(random + " Coin Kazandın");
-    // Güncel parayı kaydet
-    localStorage.setItem("coins", encrypt(newCoins.toString()));
-    document.getElementById("coin").textContent = newCoins;
     localStorage.setItem('lastClaimedDate', today);
-    document.getElementById("dailyBonusButton").disabled = true;
+    document.getElementById('dailyBonusButton').disabled = true;
 }
 
-// Sayfa yüklendiğinde işlemleri başlat
+function openGame(index) {
+    window.location.href = "/" + games[index].name + ".html"
+}
+
+function renderGames() {
+    const gamesContainer = document.getElementById('gamesContainer');
+    gamesContainer.innerHTML = '';
+    games.forEach((game, index) => {
+        const gameCard = document.createElement('div');
+        gameCard.className = 'game-card';
+        gameCard.style.backgroundColor = game.color;
+        gameCard.textContent = game.icon + game.name;
+        gameCard.onclick = () => openGame(index);
+        gamesContainer.appendChild(gameCard);
+    });
+}
+
+function renderTransactions() {
+    const transactionsContainer = document.getElementById('transactionsContainer');
+    transactionsContainer.innerHTML = '';
+    transactions.forEach(transaction => {
+        const transactionElement = document.createElement('div');
+        transactionElement.className = `transaction ${transaction.type}`;
+        transactionElement.innerHTML = `
+            <span class="game">${transaction.game}</span>
+            <span class="amount">${transaction.type === 'win' ? '+' : '-'}${transaction.amount}$</span>
+        `;
+        transactionsContainer.appendChild(transactionElement);
+    });
+}
+
+function switchTab(tabName) {
+    document.querySelectorAll('.menu a').forEach(link => link.classList.remove('active'));
+    document.querySelector(`.menu a[data-tab="${tabName}"]`).classList.add('active');
+    
+    document.getElementById('gamesContainer').style.display = tabName === 'games' ? 'grid' : 'none';
+    document.getElementById('transactionsContainer').style.display = tabName === 'transactions' ? 'flex' : 'none';
+    document.getElementById('storeContainer').style.display = tabName === 'store' ? 'block' : 'none';
+    
+    document.getElementById('pageTitle').textContent = tabName.charAt(0).toUpperCase() + tabName.slice(1);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initializeCoins();
-    const coins = getCoins();
-    document.getElementById('coin').textContent = coins;
-    
-    // Eğer bonus zaten alındıysa butonu devre dışı bırak
-    const lastClaimedDate = localStorage.getItem('lastClaimedDate');
-    const today = new Date().toISOString().split('T')[0]; // Bugünün tarihi
+    updateCoins(0);
+    renderGames();
+    renderTransactions();
 
-    if (lastClaimedDate === today) {
-        document.getElementById("dailyBonusButton").disabled = true;
-    }
+    const lastClaimedDate = localStorage.getItem('lastClaimedDate');
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('dailyBonusButton').disabled = lastClaimedDate === today;
+
+    document.querySelectorAll('.menu a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchTab(e.target.getAttribute('data-tab'));
+        });
+    });
+
+    document.getElementById('dailyBonusButton').addEventListener('click', claimDailyBonus);
+
+    switchTab('games');
 });

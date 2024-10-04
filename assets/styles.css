@@ -1,96 +1,167 @@
-body {
-    font-family: 'Nunito', sans-serif;
+body, html {
     margin: 0;
     padding: 0;
+    font-family: "Nunito", sans-serif;
+    height: 100%;
+    background-color: #1a1a2e;
+    color: white;
+}
+
+.dashboard {
+    display: flex;
+    height: 100%;
+}
+
+.sidebar {
+    background-color: #16213e;
+    width: 250px;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.balance {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #0f3460;
+    border-radius: 10px;
+    color: white;
     text-align: center;
-    background-color: white;
 }
 
-header {
-    height: 80px;
-    background-color: white;
-    padding: 40px;
-    position: relative;
-    display: flex; 
-    justify-content: center;
-    position: relative;
+.menu {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
 }
 
-.mail-container {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    display: flex;
-    align-items: center;
-    padding: 10px 0px 0px 5px;
-    background-color: white;
-    border: 1.5px solid black;
-    border-radius: 10px;
-    z-index: 10;
-}
-
-.mail-icon {
-    width: 20px;
-    height: 20px;
-    margin-right: 5px;
-}
-
-h1 {
-    font-size: 40px;
-    margin: 50px;
-}
-
-.coin-container {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    display: flex;
-    align-items: center;
-    padding: 5px 10px;
-    background-color: white;
-    border: 1.5px solid black;
-    border-radius: 10px;
-    z-index: 10;
-}
-
-.coin-icon {
-    width: 20px;
-    height: 20px;
-    margin-right: 5px;
-}
-
-.coin-count {
-    font-size: 13px;
-}
-
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-    padding: 20px;
-}
-
-.grid-container img {
-    border: 2px solid black;
-    border-radius: 20px;
-    width: 100%;
-    height: auto;
-}
-
-footer {
-    background-color: white;
-    padding: 20px;
-}
-
-.button-container {
+.menu li {
     margin-bottom: 10px;
 }
 
-button {
-    margin: 0 10px;
-    padding: 10px 20px;
-    font-size: 16px;
+.menu a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+    padding: 15px;
+    border-radius: 8px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.menu a:hover, .menu a.active {
     background-color: white;
-    border: 1.5px solid black;
+    color: #16213e;
+}
+
+.content {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+h1 {
+    color: white;
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.games {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.game-card {
+    background-color: #0f3460;
     border-radius: 10px;
+    color: white;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    padding: 20px;
+    font-size: 24px;
+}
+
+.game-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(233, 69, 96, 0.5);
+}
+
+.transactions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.transaction {
+    padding: 15px;
+    background-color: #0f3460;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.transaction .game {
+    font-weight: bold;
+}
+
+.transaction .amount {
+    font-size: 18px;
+}
+
+.transaction.win .amount {
+    color: #4caf50;
+}
+
+.transaction.loss .amount {
+    color: #f44336;
+}
+
+.daily-bonus-btn {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.daily-bonus-btn:hover {
+    background-color: #d63851;
+}
+
+.daily-bonus-btn:disabled {
+    background-color: #7e2936;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .dashboard {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        order: -1;
+    }
+
+    .menu {
+        display: flex;
+        overflow-x: auto;
+        margin-bottom: 20px;
+    }
+
+    .menu li {
+        margin-right: 10px;
+        margin-bottom: 0;
+    }
 }

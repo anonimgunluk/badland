@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="tr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>BadLand - Slot</title>
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="assets/styles.css" />
+        <style>
+            .slot-machine {
+                display: flex;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+
+            .slot {
+                font-size: 48px;
+                margin: 0 10px;
+                text-align: center;
+                padding: 10px;
+                width: 80px;
+                height: 80px;
+                background-color: #0f3460;
+                border-radius: 10px;
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+                transition: transform 0.5s ease;
+            }
+
+            .slot.spinning {
+                transform: rotateY(360deg);
+            }
+
+            button {
+                background-color: #4caf50;
+                border: none;
+                color: white;
+                padding: 10px 20px;
+                font-size: 16px;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+
+            button:hover {
+                background-color: #e84563;
+            }
+
+            button:disabled {
+                background-color: #7e2936;
+                cursor: not-allowed;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="dashboard">
+            <div class="sidebar">
+                <div class="balance" id="coin">0$</div>
+                <ul class="menu">
+                    <li><a href="index.html" data-tab="games">Oyunlar</a></li>
+                    <li><a href="index.html" data-tab="transactions">İşlemler</a></li>
+                    <li><a href="#" data-tab="store">Mağaza</a></li>
+                </ul>
+                <button id="dailyBonusButton" class="daily-bonus-btn">Günlük Bonus Al</button>
+            </div>
+            <div class="content">
+                <main>
+                    <div class="slot-machine">
+                        <div class="slot" id="slot1">🍒</div>
+                        <div class="slot" id="slot2">🍒</div>
+                        <div class="slot" id="slot3">🍒</div>
+                    </div>
+                    <button id="spin-button">Çevir</button>
+                </main>
+                <footer>
+                    <p>&copy; 2024 BadLand. Tüm hakları saklıdır.</p>
+                </footer>
+                <script>
+                    const slotValues = ["🍒", "🍋", "🍊", "🍉", "⭐", "💰"]; // Slot simgeleri
+                    const spinButton = document.getElementById("spin-button");
+
+                    function spinSlots() {
+                        const currentCoins = getCoins();
+
+                        // Eğer yeterli para yoksa döndürme işlemini yapma
+                        if (currentCoins < 10) {
+                            alert("Yeterli paranız yok!");
+                            window.location.href = "/index.html";
+                            return;
+                        }
+
+                        // 10 para çıkar
+                        const newCoins = currentCoins - 10;
+                        localStorage.setItem("coins", encrypt(newCoins.toString())); // Güncel parayı kaydet
+                        document.getElementById("coin").textContent = newCoins; // Güncel miktarı göster
+
+                        // Her slot için döndürme animasyonu ve rastgele değer atama
+                        for (let i = 1; i <= 3; i++) {
+                            const slot = document.getElementById(`slot${i}`);
+                            slot.classList.add("spinning"); // Animasyon sınıfını ekle
+
+                            // Rastgele değer atama
+                            setTimeout(() => {
+                                const randomIndex = Math.floor(Math.random() * slotValues.length);
+                                slot.textContent = slotValues[randomIndex]; // Rastgele değer atama
+                                slot.classList.remove("spinning"); // Animasyon sınıfını kaldır
+                            }, 500); // 500 ms sonra değer atama
+                        }
+
+                        // Kazanç hesaplamayı biraz geciktir
+                        setTimeout(calculateWinnings, 600); // 600 ms sonra kazanma hesapla
+                    }
+
+                    function calculateWinnings() {
+                        const slot1 = document.getElementById("slot1").textContent;
+                        const slot2 = document.getElementById("slot2").textContent;
+                        const slot3 = document.getElementById("slot3").textContent;
+
+                        // Kazanç kontrolü
+                        if (slot1 === slot2 && slot2 === slot3) {
+                            const winnings = 100; // Kazanç miktarı
+                            let coins = getCoins() + winnings; // Kazanç ekle
+                            localStorage.setItem("coins", encrypt(coins.toString())); // Şifreli olarak kaydet
+                            document.getElementById("coin").textContent = coins; // Güncel miktar
+                            alert(`Tebrikler! ${winnings} Coins kazandınız!`);
+                        } else if (slot1 === slot2 || slot2 === slot3 || slot1 === slot3) {
+                            const winnings = 20; // İki slot eşleşirse kazanç
+                            let coins = getCoins() + winnings; // Kazanç ekle
+                            localStorage.setItem("coins", encrypt(coins.toString())); // Şifreli olarak kaydet
+                            document.getElementById("coin").textContent = coins; // Güncel miktar
+                            alert(`Tebrikler! ${winnings} Coins kazandınız!`);
+                        } else {
+                            alert("Kayıp! Şansınızı tekrar deneyin."); // Kazanılmadığında mesaj
+                        }
+                    }
+
+                    spinButton.addEventListener("click", spinSlots);
+                </script>
+            </div>
+        </div>
+        <script src="assets/script.js"></script>
+    </body>
+</html>
