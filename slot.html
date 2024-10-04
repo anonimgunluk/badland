@@ -7,6 +7,13 @@
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="assets/styles.css" />
         <style>
+            .content {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+
             .slot-machine {
                 display: flex;
                 justify-content: center;
@@ -14,129 +21,145 @@
             }
 
             .slot {
-                font-size: 48px;
-                margin: 0 10px;
-                text-align: center;
+                font-size: 3rem;
+                margin: 0 15px;
                 padding: 10px;
                 width: 80px;
                 height: 80px;
-                background-color: #0f3460;
+                border: 2px solid #000;
+                background-color: white;
                 border-radius: 10px;
-                box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-                transition: transform 0.5s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
-            .slot.spinning {
-                transform: rotateY(360deg);
+            .spinning {
+                animation: spin 0.5s linear infinite;
+            }
+
+            @keyframes spin {
+                from {
+                    transform: rotateX(0deg);
+                }
+                to {
+                    transform: rotateX(360deg);
+                }
             }
 
             button {
-                background-color: #4caf50;
-                border: none;
-                color: white;
                 padding: 10px 20px;
-                font-size: 16px;
-                border-radius: 8px;
+                font-size: 1.2rem;
                 cursor: pointer;
-                transition: background-color 0.3s;
-            }
-
-            button:hover {
-                background-color: #e84563;
-            }
-
-            button:disabled {
-                background-color: #7e2936;
-                cursor: not-allowed;
+                background-color: #4caf50;
+                color: white;
+                border: none;
+                padding: 15px;
+                border-radius: 8px;
             }
         </style>
     </head>
     <body>
         <div class="dashboard">
             <div class="sidebar">
-                <div class="balance" id="coin">0$</div>
+                <div class="balance" id="coin">100$</div>
                 <ul class="menu">
-                    <li><a href="index.html" data-tab="games">Oyunlar</a></li>
-                    <li><a href="index.html" data-tab="transactions">İşlemler</a></li>
-                    <li><a href="#" data-tab="store">Mağaza</a></li>
+                    <li><a href="index.html" data-tab="oyunlar">Oyunlar</a></li>
+                    <li><a href="index.html" data-tab="işlemler">İşlemler</a></li>
+                    <li><a href="index.html" data-tab="mağaza">Mağaza</a></li>
                 </ul>
                 <button id="dailyBonusButton" class="daily-bonus-btn">Günlük Bonus Al</button>
             </div>
+
             <div class="content">
-                <main>
-                    <div class="slot-machine">
-                        <div class="slot" id="slot1">🍒</div>
-                        <div class="slot" id="slot2">🍒</div>
-                        <div class="slot" id="slot3">🍒</div>
-                    </div>
-                    <button id="spin-button">Çevir</button>
-                </main>
-                <footer>
-                    <p>&copy; 2024 BadLand. Tüm hakları saklıdır.</p>
-                </footer>
-                <script>
-                    const slotValues = ["🍒", "🍋", "🍊", "🍉", "⭐", "💰"]; // Slot simgeleri
-                    const spinButton = document.getElementById("spin-button");
-
-                    function spinSlots() {
-                        const currentCoins = getCoins();
-
-                        // Eğer yeterli para yoksa döndürme işlemini yapma
-                        if (currentCoins < 10) {
-                            alert("Yeterli paranız yok!");
-                            window.location.href = "/index.html";
-                            return;
-                        }
-
-                        // 10 para çıkar
-                        const newCoins = currentCoins - 10;
-                        localStorage.setItem("coins", encrypt(newCoins.toString())); // Güncel parayı kaydet
-                        document.getElementById("coin").textContent = newCoins; // Güncel miktarı göster
-
-                        // Her slot için döndürme animasyonu ve rastgele değer atama
-                        for (let i = 1; i <= 3; i++) {
-                            const slot = document.getElementById(`slot${i}`);
-                            slot.classList.add("spinning"); // Animasyon sınıfını ekle
-
-                            // Rastgele değer atama
-                            setTimeout(() => {
-                                const randomIndex = Math.floor(Math.random() * slotValues.length);
-                                slot.textContent = slotValues[randomIndex]; // Rastgele değer atama
-                                slot.classList.remove("spinning"); // Animasyon sınıfını kaldır
-                            }, 500); // 500 ms sonra değer atama
-                        }
-
-                        // Kazanç hesaplamayı biraz geciktir
-                        setTimeout(calculateWinnings, 600); // 600 ms sonra kazanma hesapla
-                    }
-
-                    function calculateWinnings() {
-                        const slot1 = document.getElementById("slot1").textContent;
-                        const slot2 = document.getElementById("slot2").textContent;
-                        const slot3 = document.getElementById("slot3").textContent;
-
-                        // Kazanç kontrolü
-                        if (slot1 === slot2 && slot2 === slot3) {
-                            const winnings = 200; // Kazanç miktarı
-                            let coins = getCoins() + winnings; // Kazanç ekle
-                            localStorage.setItem("coins", encrypt(coins.toString())); // Şifreli olarak kaydet
-                            document.getElementById("coin").textContent = coins  + "$"; // Güncel miktar
-                            alert(`Tebrikler! ${winnings} Coins kazandınız!`);
-                        } else if (slot1 === slot2 || slot2 === slot3 || slot1 === slot3) {
-                            const winnings = 60; // İki slot eşleşirse kazanç
-                            let coins = getCoins() + winnings; // Kazanç ekle
-                            localStorage.setItem("coins", encrypt(coins.toString())); // Şifreli olarak kaydet
-                            document.getElementById("coin").textContent = coins + "$"; // Güncel miktar
-                            alert(`Tebrikler! ${winnings} Coins kazandınız!`);
-                        } else {
-                            alert("Kayıp! Şansınızı tekrar deneyin."); // Kazanılmadığında mesaj
-                        }
-                    }
-
-                    spinButton.addEventListener("click", spinSlots);
-                </script>
+                <div class="slot-machine">
+                    <div class="slot" id="slot1">🍒</div>
+                    <div class="slot" id="slot2">🍒</div>
+                    <div class="slot" id="slot3">🍒</div>
+                </div>
+                <button id="spin-button">Çevir</button>
             </div>
         </div>
+        <footer>
+            <p>&copy; 2024 BadLand. Tüm hakları saklıdır.</p>
+        </footer>
+        <script>
+            const slotValues = ["🍒", "🍋", "🍊", "🍉", "⭐", "💰"];
+            const spinButton = document.getElementById("spin-button");
+            const dailyBonusButton = document.getElementById("dailyBonusButton");
+
+            function getCoins() {
+                const encryptedCoins = localStorage.getItem("coins");
+                return encryptedCoins ? parseInt(decrypt(encryptedCoins)) : 100;
+            }
+
+            function encrypt(value) {
+                return value.split("").reverse().join("");
+            }
+
+            function decrypt(value) {
+                return value.split("").reverse().join("");
+            }
+
+            function spinSlots() {
+                const currentCoins = getCoins();
+
+                if (currentCoins < 10) {
+                    alert("Yeterli paranız yok!");
+                    return;
+                }
+
+                const newCoins = currentCoins - 10;
+                localStorage.setItem("coins", encrypt(newCoins.toString()));
+                document.getElementById("coin").textContent = `${newCoins}$`;
+
+                for (let i = 1; i <= 3; i++) {
+                    const slot = document.getElementById(`slot${i}`);
+                    slot.classList.add("spinning");
+
+                    setTimeout(() => {
+                        const randomIndex = Math.floor(Math.random() * slotValues.length);
+                        slot.textContent = slotValues[randomIndex];
+                        slot.classList.remove("spinning");
+                    }, 500);
+                }
+
+                setTimeout(calculateWinnings, 600);
+            }
+
+            function calculateWinnings() {
+                const slot1 = document.getElementById("slot1").textContent;
+                const slot2 = document.getElementById("slot2").textContent;
+                const slot3 = document.getElementById("slot3").textContent;
+
+                if (slot1 === slot2 && slot2 === slot3) {
+                    const winnings = 100;
+                    let coins = getCoins() + winnings;
+                    localStorage.setItem("coins", encrypt(coins.toString()));
+                    document.getElementById("coin").textContent = `${coins}$`;
+                    alert(`Tebrikler! ${winnings} Coins kazandınız!`);
+                } else if (slot1 === slot2 || slot2 === slot3 || slot1 === slot3) {
+                    const winnings = 40;
+                    let coins = getCoins() + winnings;
+                    localStorage.setItem("coins", encrypt(coins.toString()));
+                    document.getElementById("coin").textContent = `${coins}$`;
+                    alert(`Tebrikler! ${winnings} Coins kazandınız!`);
+                } else {
+                    alert("Kayıp! Şansınızı tekrar deneyin.");
+                }
+            }
+
+            spinButton.addEventListener("click", spinSlots);
+
+            // Günlük bonus butonu için event
+            dailyBonusButton.addEventListener("click", () => {
+                let coins = getCoins() + 50; // 50 coin ekle
+                localStorage.setItem("coins", encrypt(coins.toString()));
+                document.getElementById("coin").textContent = `${coins}$`;
+                alert("Günlük bonus aldınız! 50 Coins eklendi.");
+                dailyBonusButton.disabled = true; // Butonu devre dışı bırak
+            });
+        </script>
         <script src="assets/script.js"></script>
     </body>
 </html>

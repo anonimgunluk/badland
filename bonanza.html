@@ -7,51 +7,38 @@
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="assets/styles.css" />
         <style>
-            .game-board {
+            .content {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #game-board {
                 display: grid;
-                grid-template-columns: repeat(8, 30px);
-                grid-template-rows: repeat(8, 30px);
+                grid-template-columns: repeat(8, 50px);
+                grid-template-rows: repeat(8, 50px);
                 gap: 5px;
-                margin-bottom: 20px; /* Buton ile oyun tahtası arasında boşluk */
             }
 
             .candy {
-                width: 20px;
-                height: 20px;
-                font-size: 20px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+                text-align: center;
+                line-height: 50px;
+                border-radius: 10px;
                 cursor: pointer;
-                transition: all 0.3s ease;
             }
 
-            .empty {
-                background-color: transparent;
-            }
-
-            #restart-btn {
-                padding: 15px 30px;
-                background-color: #4caf50;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-size: 16px;
-                font-weight: bold;
-                cursor: pointer;
-                transition: background-color 0.3s;
-                display: block; /* Butonun genişliğini tam alması için */
-                margin: 0 auto; /* Butonu yatay olarak ortalar */
-            }
-
-            @keyframes explode {
+            @keyframes explode-animation {
                 0% {
                     transform: scale(1);
                     opacity: 1;
                 }
                 50% {
                     transform: scale(1.5);
-                    opacity: 0.5;
+                    opacity: 0.7;
                 }
                 100% {
                     transform: scale(0);
@@ -60,140 +47,176 @@
             }
 
             .explode {
-                animation: explode 0.5s forwards;
+                animation: explode-animation 0.5s ease-out forwards;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-size: 1.2rem;
+                cursor: pointer;
+                background-color: #4caf50;
+                color: white;
+                border: none;
+                padding: 15px;
+                border-radius: 8px;
             }
         </style>
     </head>
     <body>
         <div class="dashboard">
             <div class="sidebar">
-                <div class="balance" id="coin">0$</div>
+                <div class="balance" id="coin">100$</div>
                 <ul class="menu">
-                    <li><a href="#" data-tab="games">Oyunlar</a></li>
-                    <li><a href="#" data-tab="transactions">İşlemler</a></li>
-                    <li><a href="#" data-tab="store">Mağaza</a></li>
+                    <li><a href="index.html" data-tab="oyunlar">Oyunlar</a></li>
+                    <li><a href="index.html" data-tab="işlemler">İşlemler</a></li>
+                    <li><a href="index.html" data-tab="mağaza">Mağaza</a></li>
                 </ul>
                 <button id="dailyBonusButton" class="daily-bonus-btn">Günlük Bonus Al</button>
             </div>
+
             <div class="content">
-                <main>
-                    <div>
-                        <div class="game-board" id="game-board"></div>
-                        <button id="restart-btn">Çevir</button>
-                    </div>
-                </main>
-                <footer>
-                    <p>&copy; 2024 BadLand. Tüm hakları saklıdır.</p>
-                </footer>
-                <script>
-                    const board = document.getElementById("game-board");
-                    const restartButton = document.getElementById("restart-btn");
-                    const boardSize = 8;
-                    const candies = ["🍭", "🍬", "🍫", "🍰", "🍡"];
-                    let grid = [];
-                    let score = 0;
-                    const currentCoins = getCoins();
-        
-                    // Oyun tahtasını oluşturma fonksiyonu
-                    function createBoard() {
-                        board.innerHTML = ""; // Eski tahtayı temizle
-                        grid = []; // Grid'i sıfırla
-                        score = 0; // Skoru sıfırla
-        
-                        for (let i = 0; i < boardSize * boardSize; i++) {
-                            const candy = document.createElement("div");
-                            candy.classList.add("candy");
-                            candy.textContent = candies[Math.floor(Math.random() * candies.length)];
-                            candy.setAttribute("draggable", true);
-                            candy.setAttribute("data-id", i);
-                            board.appendChild(candy);
-                            grid.push(candy);
-                        }
-                        setTimeout(checkMatches, 100);
-                    }
-        
-                    // Eşleşmeleri kontrol eden fonksiyon
-                    function checkMatches() {
-                        let matchFound = false; // Eşleşme bulunup bulunmadığını kontrol etmek için
-        
-                        for (let i = 0; i < grid.length - 2; i++) {
-                            const rowMatch = [i, i + 1, i + 2];
-                            const colMatch = [i, i + boardSize, i + boardSize * 2];
-        
-                            if (rowMatch.every((idx) => grid[idx].textContent === grid[i].textContent)) {
-                                matchFound = true;
-                                rowMatch.forEach((idx) => {
-                                    grid[idx].classList.add("explode");
-                                });
-                                setTimeout(() => {
-                                    rowMatch.forEach((idx) => (grid[idx].className = "candy empty"));
-                                }, 500);
-                                score += 3;
-                            }
-        
-                            if (colMatch.every((idx) => grid[idx] && grid[idx].textContent === grid[i].textContent)) {
-                                matchFound = true;
-                                colMatch.forEach((idx) => {
-                                    grid[idx].classList.add("explode");
-                                });
-                                setTimeout(() => {
-                                    colMatch.forEach((idx) => (grid[idx].className = "candy empty"));
-                                }, 500);
-                                score += 3;
-                            }
-                        }
-        
-                        if (matchFound) {
-                            setTimeout(dropCandies, 500);
-                        } else {
-                            endGame();
-                        }
-                    }
-        
-                    // Şekerlerin düşme animasyonu
-                    function dropCandies() {
-                        for (let i = grid.length - 1; i >= boardSize; i--) {
-                            if (grid[i].classList.contains("empty")) {
-                                grid[i].textContent = grid[i - boardSize].textContent;
-                                grid[i - boardSize].className = "candy empty";
-                            }
-                        }
-                        fillEmptyCandies();
-                    }
-        
-                    // Boş hücreleri doldurma fonksiyonu
-                    function fillEmptyCandies() {
-                        for (let i = 0; i < grid.length; i++) {
-                            if (grid[i].classList.contains("empty")) {
-                                grid[i].className = "candy";
-                                grid[i].textContent = candies[Math.floor(Math.random() * candies.length)];
-                            }
-                        }
-                        setTimeout(checkMatches, 100);
-                    }
-        
-                    // Oyun bitiş işlemleri
-                    function endGame() {
-                        const winnings = score; // Elde edilen skor kazanç olarak alınıyor
-                        let coins = getCoins() + winnings; // Mevcut coinlere kazanç ekleniyor
-                        localStorage.setItem("coins", encrypt(coins.toString())); // Şifreli olarak localStorage'a kaydediliyor
-                        document.getElementById("coin").textContent = coins; // Güncel coin miktarı ekrana yazılıyor
-                        alert("Oyun bitti! Kazandığınız coin: " + winnings);
-                    }
-        
-                    // Oyunu başlatma fonksiyonu
-                    function startGame() {
-                        createBoard();
-                        let coins = getCoins() - 50;
-                        localStorage.setItem('coins', encrypt(coins.toString())); // Şifreli olarak localStorage'a kaydediliyor
-                        document.getElementById('coin').textContent = coins;
-                    }
-        
-                    // Yeniden başlatma butonuna tıklanınca oyunu yeniden başlat
-                    restartButton.addEventListener("click", startGame);
-                </script>
+                <div id="game-board"></div>
+                <button id="restart-btn">Başlat</button>
             </div>
         </div>
-        <script src="assets/script.js"></script>
+        <footer>
+            <p>&copy; 2024 BadLand. Tüm hakları saklıdır.</p>
+        </footer>
+        <script>
+            const board = document.getElementById("game-board");
+            const restartButton = document.getElementById("restart-btn");
+            const boardSize = 8;
+            const candies = ["🍭", "🍬", "🍫", "🍰", "🍡"];
+            let grid = [];
+            let score = 0;
+
+            // Yeni fonksiyonlarımızı entegre edelim
+            function encrypt(text) {
+                const key = 'mysecretkey'; // Şifreleme anahtarı
+                return text.split('').map((char, index) => 
+                    String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(index % key.length))
+                ).join('');
+            }
+
+            function decrypt(encrypted) {
+                return encrypt(encrypted); // XOR şifreleme simetrik olduğu için aynı fonksiyon
+            }
+
+            function initializeCoins() {
+                const storedCoins = localStorage.getItem('coins');
+                if (!storedCoins) {
+                    const initialCoins = 100;
+                    const encryptedCoins = encrypt(initialCoins.toString());
+                    localStorage.setItem('coins', encryptedCoins);
+                }
+            }
+
+            function getCoins() {
+                const encryptedCoins = localStorage.getItem('coins');
+                return encryptedCoins ? parseInt(decrypt(encryptedCoins), 10) : 100;
+            }
+
+            function updateCoins(amount) {
+                const currentCoins = getCoins();
+                const newCoins = currentCoins + amount;
+                localStorage.setItem('coins', encrypt(newCoins.toString()));
+                document.getElementById('coin').textContent = newCoins + '$';
+            }
+
+            // Oyun tahtasını oluşturma fonksiyonu
+            function createBoard() {
+                board.innerHTML = ""; // Eski tahtayı temizle
+                grid = []; // Grid'i sıfırla
+                score = 0; // Skoru sıfırla
+
+                for (let i = 0; i < boardSize * boardSize; i++) {
+                    const candy = document.createElement("div");
+                    candy.classList.add("candy");
+                    candy.textContent = candies[Math.floor(Math.random() * candies.length)];
+                    candy.setAttribute("draggable", true);
+                    candy.setAttribute("data-id", i);
+                    board.appendChild(candy);
+                    grid.push(candy);
+                }
+                setTimeout(checkMatches, 100);
+            }
+
+            // Eşleşmeleri kontrol eden fonksiyon
+            function checkMatches() {
+                let matchFound = false;
+
+                for (let i = 0; i < grid.length - 2; i++) {
+                    const rowMatch = [i, i + 1, i + 2];
+                    const colMatch = [i, i + boardSize, i + boardSize * 2];
+
+                    if (rowMatch.every((idx) => grid[idx].textContent === grid[i].textContent)) {
+                        matchFound = true;
+                        rowMatch.forEach((idx) => grid[idx].classList.add("explode"));
+                        setTimeout(() => {
+                            rowMatch.forEach((idx) => (grid[idx].className = "candy empty"));
+                        }, 500); // Patlama animasyonu bittikten sonra boş hücre yap
+                        score += 3;
+                    }
+
+                    if (colMatch.every((idx) => grid[idx] && grid[idx].textContent === grid[i].textContent)) {
+                        matchFound = true;
+                        colMatch.forEach((idx) => grid[idx].classList.add("explode"));
+                        setTimeout(() => {
+                            colMatch.forEach((idx) => (grid[idx].className = "candy empty"));
+                        }, 500);
+                        score += 3;
+                    }
+                }
+
+                if (matchFound) {
+                    setTimeout(dropCandies, 500); // Patlamadan sonra şekerler düşsün
+                } else {
+                    endGame();
+                }
+            }
+
+            // Şekerlerin düşme animasyonu
+            function dropCandies() {
+                for (let i = grid.length - 1; i >= boardSize; i--) {
+                    if (grid[i].classList.contains("empty")) {
+                        grid[i].textContent = grid[i - boardSize].textContent;
+                        grid[i - boardSize].className = "candy empty";
+                    }
+                }
+                fillEmptyCandies();
+            }
+
+            // Boş hücreleri doldurma fonksiyonu
+            function fillEmptyCandies() {
+                for (let i = 0; i < grid.length; i++) {
+                    if (grid[i].classList.contains("empty")) {
+                        grid[i].className = "candy";
+                        grid[i].textContent = candies[Math.floor(Math.random() * candies.length)];
+                    }
+                }
+                setTimeout(checkMatches, 100);
+            }
+
+            // Oyun bitiş işlemleri
+            function endGame() {
+                const winnings = score;
+                updateCoins(winnings); // Kazanılan coin'i güncelle
+                alert("Oyun bitti! Kazandığınız coin: " + winnings);
+            }
+
+            // Oyunu başlatma fonksiyonu
+            function startGame() {
+                createBoard();
+                updateCoins(-50); // Oyuna başlarken 50 coin düşer
+            }
+
+            // Sayfa yüklendiğinde coinleri başlat ve oyunu başlat
+            document.addEventListener('DOMContentLoaded', () => {
+                initializeCoins(); // İlk başlatma
+                document.getElementById('coin').textContent = getCoins() + '$'; // Coin'i göster
+                restartButton.addEventListener("click", startGame); // Restart butonuna tıklayınca oyunu başlat
+            });
+
+        </script>
     </body>
 </html>
