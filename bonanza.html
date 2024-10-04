@@ -217,6 +217,10 @@
                 restartButton.addEventListener("click", startGame); // Restart butonuna tıklayınca oyunu başlat
             });
 
+            const cndy = candies[Math.floor(Math.random() * candies.length)];
+            for (let i = 0; i < 64; i++) {    
+                document.getElementById("game-board").innerHTML += "<div class='candy' draggable='true' data-id='" + i + "'>"+ cndy +"</div>";
+            }
         </script>
     </body>
 </html>
