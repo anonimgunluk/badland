@@ -120,13 +120,13 @@
                             const winnings = 200; // Kazanç miktarı
                             let coins = getCoins() + winnings; // Kazanç ekle
                             localStorage.setItem("coins", encrypt(coins.toString())); // Şifreli olarak kaydet
-                            document.getElementById("coin").textContent = coins; // Güncel miktar
+                            document.getElementById("coin").textContent = coins  + "$"; // Güncel miktar
                             alert(`Tebrikler! ${winnings} Coins kazandınız!`);
                         } else if (slot1 === slot2 || slot2 === slot3 || slot1 === slot3) {
                             const winnings = 60; // İki slot eşleşirse kazanç
                             let coins = getCoins() + winnings; // Kazanç ekle
                             localStorage.setItem("coins", encrypt(coins.toString())); // Şifreli olarak kaydet
-                            document.getElementById("coin").textContent = coins; // Güncel miktar
+                            document.getElementById("coin").textContent = coins + "$"; // Güncel miktar
                             alert(`Tebrikler! ${winnings} Coins kazandınız!`);
                         } else {
                             alert("Kayıp! Şansınızı tekrar deneyin."); // Kazanılmadığında mesaj
