@@ -1,4 +1,5 @@
-body, html {
+body,
+html {
     margin: 0;
     padding: 0;
     font-family: "Nunito", sans-serif;
@@ -33,6 +34,17 @@ body, html {
     text-align: center;
 }
 
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td,th {
+    text-align: center;
+    padding: 8px;
+}
+
 .menu {
     list-style-type: none;
     padding: 0;
@@ -54,7 +66,8 @@ body, html {
     transition: background-color 0.3s, color 0.3s;
 }
 
-.menu a:hover, .menu a.active {
+.menu a:hover,
+.menu a.active {
     background-color: white;
     color: #16213e;
 }
@@ -122,6 +135,48 @@ h1 {
 
 .transaction.loss .amount {
     color: #f44336;
+}
+
+.product-card {
+    background: #16213e;
+    border-radius: 10px;
+    padding: 20px;
+    color: white;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.product-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+    font-weight: bold; /* Ürün başlığı daha kalın */
+}
+
+.product-description {
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+.product-price {
+    font-size: 20px;
+    font-weight: bold;
+    color: #f39c12; /* Ürün fiyatı için turuncu renk */
+}
+
+.buy-button {
+    background-color: #27ae60; /* Yeşil buton rengi */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.buy-button:hover {
+    background-color: #219150; /* Hover sırasında daha koyu yeşil */
+    transform: scale(1.05); /* Buton hover'da büyüsün */
 }
 
 .daily-bonus-btn {
