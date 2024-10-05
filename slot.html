@@ -65,10 +65,9 @@
                 <div class="balance" id="coin">100$</div>
                 <ul class="menu">
                     <li><a href="index.html" data-tab="oyunlar">Oyunlar</a></li>
-                    <li><a href="index.html" data-tab="işlemler">İşlemler</a></li>
                     <li><a href="index.html" data-tab="mağaza">Mağaza</a></li>
+                    <li><a href="index.html" data-tab="işlemler">İşlemler</a></li>
                 </ul>
-                <button id="dailyBonusButton" class="daily-bonus-btn">Günlük Bonus Al</button>
             </div>
 
             <div class="content">
@@ -104,14 +103,10 @@
             function spinSlots() {
                 const currentCoins = getCoins();
 
-                if (currentCoins < 10) {
-                    alert("Yeterli paranız yok!");
-                    return;
-                }
-
                 const newCoins = currentCoins - 10;
                 localStorage.setItem("coins", encrypt(newCoins.toString()));
                 document.getElementById("coin").textContent = `${newCoins}$`;
+                addLog("loss", 10, "Slot");
 
                 for (let i = 1; i <= 3; i++) {
                     const slot = document.getElementById(`slot${i}`);
@@ -133,17 +128,17 @@
                 const slot3 = document.getElementById("slot3").textContent;
 
                 if (slot1 === slot2 && slot2 === slot3) {
-                    const winnings = 100;
-                    let coins = getCoins() + winnings;
-                    localStorage.setItem("coins", encrypt(coins.toString()));
+                    let coins = getCoins() + 100;
+                    updateCoins(100);
                     document.getElementById("coin").textContent = `${coins}$`;
-                    alert(`Tebrikler! ${winnings} Coins kazandınız!`);
+                    addLog("win", 100, "Slot");
+                    alert(`Tebrikler! 100 Coins kazandınız!`);
                 } else if (slot1 === slot2 || slot2 === slot3 || slot1 === slot3) {
-                    const winnings = 40;
-                    let coins = getCoins() + winnings;
-                    localStorage.setItem("coins", encrypt(coins.toString()));
+                    let coins = getCoins() + 40;
+                    updateCoins(40);
                     document.getElementById("coin").textContent = `${coins}$`;
-                    alert(`Tebrikler! ${winnings} Coins kazandınız!`);
+                    addLog("win", 40, "Slot");
+                    alert(`Tebrikler! 40 Coins kazandınız!`);
                 } else {
                     alert("Kayıp! Şansınızı tekrar deneyin.");
                 }
@@ -154,7 +149,7 @@
             // Günlük bonus butonu için event
             dailyBonusButton.addEventListener("click", () => {
                 let coins = getCoins() + 50; // 50 coin ekle
-                localStorage.setItem("coins", encrypt(coins.toString()));
+                updateCoins(winnings);
                 document.getElementById("coin").textContent = `${coins}$`;
                 alert("Günlük bonus aldınız! 50 Coins eklendi.");
                 dailyBonusButton.disabled = true; // Butonu devre dışı bırak
