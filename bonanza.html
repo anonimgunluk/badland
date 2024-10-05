@@ -68,12 +68,10 @@
                 <div class="balance" id="coin">100$</div>
                 <ul class="menu">
                     <li><a href="index.html" data-tab="oyunlar">Oyunlar</a></li>
-                    <li><a href="index.html" data-tab="işlemler">İşlemler</a></li>
                     <li><a href="index.html" data-tab="mağaza">Mağaza</a></li>
+                    <li><a href="index.html" data-tab="işlemler">İşlemler</a></li>
                 </ul>
-                <button id="dailyBonusButton" class="daily-bonus-btn">Günlük Bonus Al</button>
             </div>
-
             <div class="content">
                 <div id="game-board"></div>
                 <button id="restart-btn">Başlat</button>
@@ -82,6 +80,7 @@
         <footer>
             <p>&copy; 2024 BadLand. Tüm hakları saklıdır.</p>
         </footer>
+        <script src="assets/script.js"></script>
         <script>
             const board = document.getElementById("game-board");
             const restartButton = document.getElementById("restart-btn");
@@ -89,39 +88,6 @@
             const candies = ["🍭", "🍬", "🍫", "🍰", "🍡"];
             let grid = [];
             let score = 0;
-
-            // Yeni fonksiyonlarımızı entegre edelim
-            function encrypt(text) {
-                const key = 'mysecretkey'; // Şifreleme anahtarı
-                return text.split('').map((char, index) => 
-                    String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(index % key.length))
-                ).join('');
-            }
-
-            function decrypt(encrypted) {
-                return encrypt(encrypted); // XOR şifreleme simetrik olduğu için aynı fonksiyon
-            }
-
-            function initializeCoins() {
-                const storedCoins = localStorage.getItem('coins');
-                if (!storedCoins) {
-                    const initialCoins = 100;
-                    const encryptedCoins = encrypt(initialCoins.toString());
-                    localStorage.setItem('coins', encryptedCoins);
-                }
-            }
-
-            function getCoins() {
-                const encryptedCoins = localStorage.getItem('coins');
-                return encryptedCoins ? parseInt(decrypt(encryptedCoins), 10) : 100;
-            }
-
-            function updateCoins(amount) {
-                const currentCoins = getCoins();
-                const newCoins = currentCoins + amount;
-                localStorage.setItem('coins', encrypt(newCoins.toString()));
-                document.getElementById('coin').textContent = newCoins + '$';
-            }
 
             // Oyun tahtasını oluşturma fonksiyonu
             function createBoard() {
@@ -199,15 +165,17 @@
 
             // Oyun bitiş işlemleri
             function endGame() {
-                const winnings = score;
+                const winnings = score * 2;
                 updateCoins(winnings); // Kazanılan coin'i güncelle
-                alert("Oyun bitti! Kazandığınız coin: " + winnings);
+                addLog("win", winnings, "Bonanza");
+                alert("Oyun bitti! Kazandığınız coin: " + (winnings - 40));
             }
 
             // Oyunu başlatma fonksiyonu
             function startGame() {
                 createBoard();
-                updateCoins(-50); // Oyuna başlarken 50 coin düşer
+                updateCoins(-40);
+                addLog("loss", 40, "Bonanza");
             }
 
             // Sayfa yüklendiğinde coinleri başlat ve oyunu başlat
