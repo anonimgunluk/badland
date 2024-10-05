@@ -1,28 +1,74 @@
 const games = [
     { name: "slot", icon: "🎰 ", color: "#3498db" },
-    { name: "rulet", icon: "🎡 ",color: "#e74c3c" },
-    { name: "blackjack", icon: "🃏 ",color: "#2ecc71" },
-    { name: "bonanza", icon: "🍬 ",color: "#f39c12" }
+    { name: "rulet", icon: "🗡️ ", color: "#e74c3c" },
+    { name: "blackjack", icon: "🃏 ", color: "#2ecc71" },
+    { name: "bonanza", icon: "🍬 ", color: "#f39c12" },
 ];
 
-const transactions = [
-    { type: 'win', amount: 5000, game: 'Blackjack' },
-    { type: 'loss', amount: 2000, game: 'Poker' },
-    { type: 'win', amount: 3000, game: 'Slot Machine' },
-    { type: 'loss', amount: 1000, game: 'Roulette' },
-    { type: 'win', amount: 5000, game: 'Blackjack' },
-    { type: 'loss', amount: 2000, game: 'Poker' },
-    { type: 'win', amount: 3000, game: 'Slot Machine' },
-    { type: 'loss', amount: 1000, game: 'Roulette' }
-];
+// İşlem kayıtlarını localStorage'dan yükle
+function loadTransactions() {
+    const storedTransactions = localStorage.getItem('transactions');
+    return storedTransactions ? JSON.parse(storedTransactions) : [];
+}
 
-const key = 'mysecretkey'; // XOR şifreleme için kullanılan anahtar
+// İşlem kayıtlarını localStorage'a kaydet
+function saveTransactions(transactions) {
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+}
+
+// Yeni işlem ekleme fonksiyonu
+function addLog(type, amount, game) {
+    const transactions = loadTransactions();
+    const newTransaction = {
+        type: type,
+        amount: amount,
+        game: game,
+    };
+
+    transactions.push(newTransaction);
+    saveTransactions(transactions);
+    console.log('Yeni işlem eklendi:', newTransaction);
+}
+
+function getBrowserFingerprint() {
+    const userAgent = navigator.userAgent;
+    const language = navigator.language || navigator.userLanguage;
+    const screenResolution = `${screen.width}x${screen.height}`;
+    const colorDepth = screen.colorDepth;
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const platform = navigator.platform;
+    const fingerprint = userAgent + language + screenResolution + colorDepth + timezone + platform;
+    return hash(fingerprint);
+}
+
+function hash(str) {
+    let hash = 0,
+        i,
+        chr;
+    for (i = 0; i < str.length; i++) {
+        chr = str.charCodeAt(i);
+        hash = (hash << 5) - hash + chr; // hash * 31 + chr
+        hash |= 0; // 32 bit tam sayıya döndür
+    }
+    return hash.toString();
+}
+
+// Tarayıcı parmak izini almak ve yerel depolamada saklamak
+
+function saveFingerprint() {
+    const fingerprint = getBrowserFingerprint();
+    localStorage.setItem("userFingerprint", fingerprint);
+}
+
+const fingerprint = localStorage.getItem("userFingerprint") || saveFingerprint();
+const key = fingerprint;
 
 // XOR şifreleme fonksiyonu (şifrelemek ve çözmek için aynı fonksiyon kullanılır)
 function encrypt(text) {
-    return text.split('').map((char, index) => 
-        String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(index % key.length))
-    ).join('');
+    return text
+        .split("")
+        .map((char, index) => String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(index % key.length)))
+        .join("");
 }
 
 function decrypt(encrypted) {
@@ -31,17 +77,17 @@ function decrypt(encrypted) {
 
 // Oyuncunun coin değerini LocalStorage'da başlatan fonksiyon
 function initializeCoins() {
-    const storedCoins = localStorage.getItem('coins');
+    const storedCoins = localStorage.getItem("coins");
     if (!storedCoins) {
         const initialCoins = 100; // İlk başlatma için coin miktarı
         const encryptedCoins = encrypt(initialCoins.toString());
-        localStorage.setItem('coins', encryptedCoins);
+        localStorage.setItem("coins", encryptedCoins);
     }
 }
 
 // Coin değerini LocalStorage'dan alıp çözerek döndüren fonksiyon
 function getCoins() {
-    const encryptedCoins = localStorage.getItem('coins');
+    const encryptedCoins = localStorage.getItem("coins");
     return encryptedCoins ? parseInt(decrypt(encryptedCoins), 10) : 0;
 }
 
@@ -49,25 +95,26 @@ function getCoins() {
 function updateCoins(amount) {
     const currentCoins = getCoins();
     const newCoins = currentCoins + amount;
-    localStorage.setItem('coins', encrypt(newCoins.toString()));
-    document.getElementById('coin').textContent = newCoins + '$';
+    localStorage.setItem("coins", encrypt(newCoins.toString()));
+    document.getElementById("coin").textContent = newCoins + "$";
 }
 
 // Günlük bonusu talep etmek için fonksiyon
 function claimDailyBonus() {
-    const lastClaimedDate = localStorage.getItem('lastClaimedDate');
-    const today = new Date().toISOString().split('T')[0];
+    const lastClaimedDate = localStorage.getItem("lastClaimedDate");
+    const today = new Date().toISOString().split("T")[0];
 
     if (lastClaimedDate === today) {
-        alert('Günlük bonusu zaten aldınız!');
+        alert("Günlük bonusu zaten aldınız!");
         return;
     }
 
     const randomBonus = Math.floor(Math.random() * (200 - 50 + 1)) + 50;
     updateCoins(randomBonus);
     alert(randomBonus + " Coin Kazandınız!");
-    localStorage.setItem('lastClaimedDate', today);
-    document.getElementById('dailyBonusButton').disabled = true;
+    addLog("win", randomBonus, "Günlük bonus");
+    localStorage.setItem("lastClaimedDate", today);
+    document.getElementById("dailyBonusButton").disabled = true;
 }
 
 // Oyun sayfasına yönlendiren fonksiyon
@@ -77,11 +124,11 @@ function openGame(index) {
 
 // Oyunları render eden fonksiyon
 function renderGames() {
-    const gamesContainer = document.getElementById('gamesContainer');
-    gamesContainer.innerHTML = '';
+    const gamesContainer = document.getElementById("gamesContainer");
+    gamesContainer.innerHTML = "";
     games.forEach((game, index) => {
-        const gameCard = document.createElement('div');
-        gameCard.className = 'game-card';
+        const gameCard = document.createElement("div");
+        gameCard.className = "game-card";
         gameCard.style.backgroundColor = game.color;
         gameCard.textContent = game.icon + game.name;
         gameCard.onclick = () => openGame(index);
@@ -91,54 +138,57 @@ function renderGames() {
 
 // İşlemleri render eden fonksiyon
 function renderTransactions() {
-    const transactionsContainer = document.getElementById('transactionsContainer');
-    transactionsContainer.innerHTML = '';
-    transactions.forEach(transaction => {
-        const transactionElement = document.createElement('div');
+    const transactions = loadTransactions();
+    const transactionsContainer = document.getElementById("transactionsContainer");
+    transactionsContainer.innerHTML = "";
+    
+    // Her işlem için bir div oluşturup ekranda göstereceğiz
+    transactions.forEach((transaction) => {
+        const transactionElement = document.createElement("div");
         transactionElement.className = `transaction ${transaction.type}`;
         transactionElement.innerHTML = `
             <span class="game">${transaction.game}</span>
-            <span class="amount">${transaction.type === 'win' ? '+' : '-'}${transaction.amount}$</span>
+            <span class="amount">${transaction.type === "win" ? "+" : "-"}${transaction.amount}$</span>
         `;
-        transactionsContainer.appendChild(transactionElement);
+        transactionsContainer.prepend(transactionElement);
     });
 }
 
 // Sekmeleri geçiş yapmaya yarayan fonksiyon
 function switchTab(tabName) {
-    document.querySelectorAll('.menu a').forEach(link => link.classList.remove('active'));
-    document.querySelector(`.menu a[data-tab="${tabName}"]`).classList.add('active');
+    document.querySelectorAll(".menu a").forEach((link) => link.classList.remove("active"));
+    document.querySelector(`.menu a[data-tab="${tabName}"]`).classList.add("active");
 
-    document.getElementById('gamesContainer').style.display = tabName === 'oyunlar' ? 'grid' : 'none';
-    document.getElementById('transactionsContainer').style.display = tabName === 'işlemler' ? 'flex' : 'none';
-    document.getElementById('storeContainer').style.display = tabName === 'mağaza' ? 'block' : 'none';
+    document.getElementById("gamesContainer").style.display = tabName === "oyunlar" ? "grid" : "none";
+    document.getElementById("transactionsContainer").style.display = tabName === "işlemler" ? "flex" : "none";
+    document.getElementById("storeContainer").style.display = tabName === "mağaza" ? "block" : "none";
 
-    document.getElementById('pageTitle').textContent = tabName.charAt(0).toUpperCase() + tabName.slice(1);
+    document.getElementById("pageTitle").textContent = tabName.charAt(0).toUpperCase() + tabName.slice(1);
 }
 
 // Sayfa yüklendiğinde işlemleri başlatan event
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
     initializeCoins(); // LocalStorage'da coin varsa başlat
     updateCoins(0); // İlk coin güncellemesi (ekrana yazdırmak için)
     renderGames(); // Oyun kartlarını oluştur
     renderTransactions(); // İşlemleri göster
 
     // Günlük bonus butonunu duruma göre etkin/deaktif et
-    const lastClaimedDate = localStorage.getItem('lastClaimedDate');
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('dailyBonusButton').disabled = lastClaimedDate === today;
+    const lastClaimedDate = localStorage.getItem("lastClaimedDate");
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("dailyBonusButton").disabled = lastClaimedDate === today;
 
     // Menüdeki sekme geçişlerini ayarla
-    document.querySelectorAll('.menu a').forEach(link => {
-        link.addEventListener('click', (e) => {
+    document.querySelectorAll(".menu a").forEach((link) => {
+        link.addEventListener("click", (e) => {
             e.preventDefault();
-            switchTab(e.target.getAttribute('data-tab'));
+            switchTab(e.target.getAttribute("data-tab"));
         });
     });
 
     // Günlük bonus butonuna tıklanınca bonusu ver
-    document.getElementById('dailyBonusButton').addEventListener('click', claimDailyBonus);
+    document.getElementById("dailyBonusButton").addEventListener("click", claimDailyBonus);
 
     // Varsayılan sekmeyi aç
-    switchTab('oyunlar');
+    switchTab("oyunlar");
 });
