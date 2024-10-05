@@ -3,36 +3,199 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>BadLand</title>
+        <title>BadLand - Rus Ruleti</title>
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="assets/styles.css" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-        <script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
+        <style>
+            .content {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+            .revolver {
+                display: grid;
+                grid-template-columns: repeat(3, 80px);
+                grid-template-rows: repeat(2, 80px);
+                justify-content: center;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+            .chamber {
+                width: 80px;
+                height: 80px;
+                background-color: gray;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            }
+            .bullet {
+                background-color: red;
+            }
+            button {
+                padding: 10px 20px;
+                font-size: 1.2rem;
+                cursor: pointer;
+                background-color: #4caf50;
+                color: white;
+                border: none;
+                padding: 15px;
+                border-radius: 8px;
+                margin: 10px;
+            }
+            .game-over {
+                background-color: red;
+                color: white;
+            }
+        </style>
     </head>
     <body>
         <div class="dashboard">
             <div class="sidebar">
-                <div class="balance" id="coin">0$</div>
+                <div class="balance" id="coin">100$</div>
                 <ul class="menu">
-                    <li><a href="#" data-tab="oyunlar">Oyunlar</a></li>
-                    <li><a href="#" data-tab="mağaza">Mağaza</a></li>
-                    <li><a href="#" data-tab="işlemler">İşlemler</a></li>
+                    <li><a href="index.html" data-tab="oyunlar">Oyunlar</a></li>
+                    <li><a href="index.html" data-tab="mağaza">Mağaza</a></li>
+                    <li><a href="index.html" data-tab="işlemler">İşlemler</a></li>
                 </ul>
             </div>
             <div class="content">
-                <h1 id="pageTitle">Oyunlar</h1>
-                <div id="gamesContainer" class="games"></div>
-                <div id="transactionsContainer" class="transactions" style="display: none;"></div>
-                <div id="storeContainer" class="store" style="display: none;">
-                    <div class="product-card">
-                        <h2 class="product-title">Günlük Bonus</h2>
-                        <p class="product-description">Her gün alabileceğiniz bonus!</p>
-                        <!--<span class="product-price">Fiyat: 10$</span>-->
-                        <button id="dailyBonusButton" class="daily-bonus-btn">Günlük Bonus Al</button>
-                    </div>
+                <div id="game-result" class="result">Oyuna Başlayın!</div>
+                <div class="revolver">
+                    <div class="chamber" id="chamber1"></div>
+                    <div class="chamber" id="chamber2"></div>
+                    <div class="chamber" id="chamber3"></div>
+                    <div class="chamber" id="chamber4"></div>
+                    <div class="chamber" id="chamber5"></div>
+                    <div class="chamber" id="chamber6"></div>
                 </div>
+                <div>Bahis: <span id="bet">1x</span></div>
+                <div class="buttons">
+                    <button id="self-shoot">Kendine Sık</button>
+                    <button id="bot-shoot">Karşıya Sık</button>
+                </div>
+                <button id="reset-game" style="display: none;">Yeniden Oyna</button>
             </div>
         </div>
+        <footer>
+            <p>&copy; 2024 BadLand. Tüm hakları saklıdır.</p>
+        </footer>
         <script src="assets/script.js"></script>
+        <script>
+            let bulletPosition = Math.floor(Math.random() * 6); // Rastgele bir kovan seçilir.
+            let currentTurn = 0; // Kimin sıktığı (0: oyuncu, 1: bot)
+            let gameOver = false;
+            let betMultiplier = 1;
+            let currentShot = 0; // Kaçıncı atışta olduğumuzu izler
+            const totalShots = 6; // 6 atış hakkı var
+            let chambers = document.querySelectorAll(".chamber");
+            const gameResult = document.getElementById("game-result");
+            const betDisplay = document.getElementById("bet");
+            const selfShootButton = document.getElementById("self-shoot");
+            const botShootButton = document.getElementById("bot-shoot");
+            const resetGameButton = document.getElementById("reset-game");
+
+            // Kurşunun olup olmadığını kontrol et
+            function checkShot(target) {
+                if (gameOver) return;
+
+                if (currentShot === bulletPosition) {
+                    chambers[bulletPosition].classList.add("bullet"); // Kurşunun olduğu deliği göster
+                    
+                    let coins = Math.abs(getCoins() * betMultiplier);
+                    if (target === "self") {
+                        if (currentTurn === 0) {
+                            gameResult.textContent = "Kendine sıktın, kaybettin!";
+                            updateCoins(-coins);
+                            addLog("loss", coins, "Rulet");
+                        } else {
+                            gameResult.textContent = "Bot seni vurdu, kaybettin!";
+                            updateCoins(-coins);
+                            addLog("loss", coins, "Rulet");
+                        }
+                        endGame();
+                    } else {
+                        if (currentTurn === 0) {
+                            gameResult.textContent = "Bot'a sıktın! kazandın!";
+                            updateCoins(coins);
+                            addLog("win", coins, "Rulet");
+                        } else {
+                            gameResult.textContent = "Bot kendini vurdu, kazandın!";
+                            updateCoins(coins);
+                            addLog("win", coins, "Rulet");
+                        }
+                        endGame();
+                    }
+                } else {
+                    if (currentTurn === 0 && target === "self") {
+                        betMultiplier *= 2;
+                        gameResult.textContent = "Hayatta kaldın! Bahis: " + betMultiplier + "x";
+                    } else if (currentTurn === 0 && target === "bot") {
+                        betMultiplier /= 2;
+                        gameResult.textContent = "Bot'a sıktın ama hayatta! Bahis: " + betMultiplier + "x";
+                    } else {
+                        gameResult.textContent = "Bot hayatta, sıran geldi!";
+                    }
+
+                    betDisplay.textContent = betMultiplier + "x";
+                    switchTurn();
+                }
+
+                currentShot++;
+                if (currentShot >= totalShots) {
+                    endGame();
+                }
+            }
+
+            // Sırayı değiştir
+            function switchTurn() {
+                currentTurn = currentTurn === 0 ? 1 : 0;
+
+                if (currentTurn === 1) {
+                    setTimeout(() => {
+                        const botChoice = Math.random() < 0.5 ? "self" : "player"; // Bot %50 kendine, %50 oyuncuya sıkabilir
+                        checkShot(botChoice);
+                    }, 1000);
+                }
+            }
+
+            // Oyunu bitir
+            function endGame() {
+                gameOver = true;
+                selfShootButton.style.display = "none";
+                botShootButton.style.display = "none";
+                resetGameButton.style.display = "block";
+            }
+
+            // Oyuncu kendine sıkar
+            selfShootButton.addEventListener("click", () => {
+                if (currentTurn === 0) {
+                    checkShot("self");
+                }
+            });
+
+            // Oyuncu karşıya sıkar
+            botShootButton.addEventListener("click", () => {
+                if (currentTurn === 0) {
+                    checkShot("bot");
+                }
+            });
+
+            // Oyunu sıfırla
+            resetGameButton.addEventListener("click", () => {
+                bulletPosition = Math.floor(Math.random() * 6);
+                currentTurn = 0;
+                gameOver = false;
+                betMultiplier = 1;
+                currentShot = 0;
+                chambers.forEach((chamber) => chamber.classList.remove("bullet"));
+                gameResult.textContent = "Oyuna Başlayın!";
+                betDisplay.textContent = "1x";
+                selfShootButton.style.display = "";
+                botShootButton.style.display = "";
+                resetGameButton.style.display = "none";
+            });
+        </script>
     </body>
 </html>
