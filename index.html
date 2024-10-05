@@ -6,6 +6,8 @@
         <title>BadLand</title>
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="assets/styles.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+        <script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
     </head>
     <body>
         <div class="dashboard">
@@ -16,14 +18,18 @@
                     <li><a href="#" data-tab="mağaza">Mağaza</a></li>
                     <li><a href="#" data-tab="işlemler">İşlemler</a></li>
                 </ul>
-                <button id="dailyBonusButton" class="daily-bonus-btn">Günlük Bonus Al</button>
             </div>
             <div class="content">
                 <h1 id="pageTitle">Oyunlar</h1>
                 <div id="gamesContainer" class="games"></div>
                 <div id="transactionsContainer" class="transactions" style="display: none;"></div>
                 <div id="storeContainer" class="store" style="display: none;">
-                    <p>Mağaza yakında açılacak!</p>
+                    <div class="product-card">
+                        <h2 class="product-title">Günlük Bonus</h2>
+                        <p class="product-description">Her gün alabileceğiniz bonus!</p>
+                        <!--<span class="product-price">Fiyat: 10$</span>-->
+                        <button id="dailyBonusButton" class="daily-bonus-btn">Günlük Bonus Al</button>
+                    </div>
                 </div>
             </div>
         </div>
