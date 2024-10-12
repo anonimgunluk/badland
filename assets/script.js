@@ -162,6 +162,7 @@ function switchTab(tabName) {
     document.getElementById("gamesContainer").style.display = tabName === "oyunlar" ? "grid" : "none";
     document.getElementById("transactionsContainer").style.display = tabName === "işlemler" ? "flex" : "none";
     document.getElementById("storeContainer").style.display = tabName === "mağaza" ? "block" : "none";
+    document.getElementById("helpContainer").style.display = tabName === "Yardım Merkezi" ? "block" : "none";
 
     document.getElementById("pageTitle").textContent = tabName.charAt(0).toUpperCase() + tabName.slice(1);
 }
