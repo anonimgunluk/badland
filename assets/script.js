@@ -1,8 +1,9 @@
 const games = [
     { name: "slot", icon: "🎰 ", color: "#3498db" },
-    { name: "rulet", icon: "🗡️ ", color: "#e74c3c" },
+    { name: "rus ruleti", icon: "🗡️ ", color: "#e74c3c" },
     { name: "blackjack", icon: "🃏 ", color: "#2ecc71" },
     { name: "bonanza", icon: "🍬 ", color: "#f39c12" },
+    { name: "badcoin", icon: "📈 ", color: "#217a2e" },
 ];
 
 // İşlem kayıtlarını localStorage'dan yükle
@@ -26,6 +27,9 @@ function addLog(type, amount, game) {
     };
 
     transactions.push(newTransaction);
+    if (transactions.length > 100) {
+        transactions.splice(0, transactions.length - 100); // İlk işlemleri sil
+    }
     saveTransactions(transactions);
     console.log('Yeni işlem eklendi:', newTransaction);
 }

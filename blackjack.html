@@ -7,58 +7,101 @@
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="assets/styles.css" />
         <style>
+        .content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1;
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            gap: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 48px;
+            margin: 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ffd700;
+        }
+
+        #game {
+            display: flex;
+            top: 0;
+            width: 100%;
+            justify-content: space-between;
+            padding-bottom: 100px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            width: 100px;
+            height: 150px;
+            margin: 10px;
+            border-radius: 12px;
+            background-color: #444;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .hidden {
+            background-color: #333;
+            border: 2px dashed #999;
+        }
+
+        /* Buton Tasarımı */
+        .buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 15px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        button {
+            padding: 15px 35px;
+            margin: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        /* Responsive Tasarım */
+        @media (max-width: 600px) {
             .content {
-                display: flex;
                 flex-direction: column;
-                justify-content: center;
-                align-items: center;
             }
 
             #game {
-                margin-top: 50px;
+                flex-direction: column;
+                align-items: center;
             }
+
             .card {
-                display: inline-block;
-                margin: 5px;
-                padding: 20px;
-                border: 1px solid #fff;
-                border-radius: 5px;
-                background-color: #333;
+                width: 80px;
+                height: 120px;
+                font-size: 18px;
             }
-
-            button {
-                margin: 15px;
-                padding: 12px 25px;
-                font-size: 16px;
-                color: #fff;
-                background-color: #4CAF50;
-                border: none;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
-
-            .hidden {
-                background-color: #222; /* Gizli kartın arka plan rengi */
-                border: 1px dashed #fff; /* Gizli kartın kenar rengi */
-            }
-
-            /* Responsive Design */
-@media (max-width: 600px) {
-    .card {
-        margin: 5px;
-        padding: 20px;
-        font-size: 20px;
-        width: 60px;
-        height: 90px;
-    }
-
-    button {
-        padding: 10px 15px;
-        font-size: 14px;
-    }
-}
+        }
         </style>
     </head>
     <body>
@@ -76,19 +119,22 @@
             <div class="content">
                 <div id="game">
                     <div>
-                        <h2>Senin Kartların:</h2>
-                        <div id="player-cards" class="card-container"></div>
-                        <div id="player-score">Skor: 0</div>
-                    </div>
-                    <div>
                         <h2>Krupiye Kartları:</h2>
                         <div id="dealer-cards" class="card-container"></div>
                         <div id="dealer-score">Skor: 0</div>
                     </div>
-                    <button id="hit-button" style="display: none;">Kart Al</button>
-                    <button id="stand-button" style="display: none;">Dur</button>
-                    <button id="new-game-button">Yeni Oyun</button>
+                    <div>
+                        <h2>Senin Kartların:</h2>
+                        <div id="player-cards" class="card-container"></div>
+                        <div id="player-score">Skor: 0</div>
+                    </div>
+                    
                 </div>
+            </div>
+            <div class="buttons">
+                <button id="hit-button" style="display: none;">Kart Al</button>
+                <button id="stand-button" style="display: none;">Dur</button>
+                <button id="new-game-button">Yeni Oyun</button>
             </div>
         </div>
         <script src="assets/script.js"></script>

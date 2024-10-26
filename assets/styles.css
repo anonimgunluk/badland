@@ -1,39 +1,45 @@
+/* Global Ayarlar */
 body,
 html {
     margin: 0;
     padding: 0;
     font-family: "Nunito", sans-serif;
     height: 100%;
-    background-color: #1a1a2e;
+    background-color: black;
     color: white;
 }
 
+/* Dashboard Layout */
 .dashboard {
     display: flex;
     height: 100%;
 }
 
+/* Sidebar */
 .sidebar {
-    background-color: #16213e;
     width: 250px;
     padding: 20px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    backdrop-filter: blur(10px);
+    background: rgba(23, 23, 23, 0.2);
     z-index: 1;
 }
 
+/* Balance Card */
 .balance {
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 20px;
     padding: 15px;
-    background-color: #0f3460;
+    background-color: black;
+    border: 2px solid gold;
     border-radius: 10px;
-    color: white;
     text-align: center;
 }
 
+/* Table Styles */
 table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
@@ -46,15 +52,12 @@ th {
     padding: 8px;
 }
 
+/* Menü */
 .menu {
     list-style-type: none;
     padding: 0;
     margin: 0;
     flex-grow: 1;
-}
-
-.menu li {
-    margin-bottom: 10px;
 }
 
 .menu a {
@@ -63,28 +66,33 @@ th {
     font-weight: bold;
     display: block;
     padding: 15px;
+    margin-bottom: 10px;
     border-radius: 8px;
     transition: background-color 0.3s, color 0.3s;
+    background: rgba(0, 0, 0);
 }
 
 .menu a:hover,
 .menu a.active {
-    background-color: white;
-    color: #16213e;
+    background-color: gold;
+    color: black;
 }
 
+/* İçerik */
 .content {
     flex-grow: 1;
     padding: 20px;
     overflow-y: auto;
+    padding: 10px;
 }
 
+/* Başlıklar */
 h1 {
-    color: white;
     font-size: 32px;
     margin-bottom: 20px;
 }
 
+/* Oyun Kartları */
 .games {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -92,9 +100,8 @@ h1 {
 }
 
 .game-card {
-    background-color: #0f3460;
+    background-color: black;
     border-radius: 10px;
-    color: white;
     text-align: center;
     transition: transform 0.3s, box-shadow 0.3s;
     cursor: pointer;
@@ -104,9 +111,9 @@ h1 {
 
 .game-card:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(233, 69, 96, 0.5);
 }
 
+/* İşlem Kartları */
 .transactions {
     display: flex;
     flex-direction: column;
@@ -115,19 +122,11 @@ h1 {
 
 .transaction {
     padding: 15px;
-    background-color: #0f3460;
+    border: 2px solid white;
     border-radius: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-
-.transaction .game {
-    font-weight: bold;
-}
-
-.transaction .amount {
-    font-size: 18px;
 }
 
 .transaction.win .amount {
@@ -138,60 +137,35 @@ h1 {
     color: #f44336;
 }
 
+/* Yardım Bölümü */
 .help-section {
     padding: 20px;
     margin-top: 20px;
     max-width: 800px;
     border-radius: 10px;
-}
-.help-section h2 {
-    font-size: 28px;
-    margin-bottom: 20px;
-}
-.help-section p {
-    font-size: 18px;
-    line-height: 1.6;
-}
-.faq {
-    margin-top: 20px;
-}
-.faq h3 {
-    font-size: 22px;
-    margin-bottom: 10px;
-}
-.faq p {
-    margin-bottom: 15px;
+    background-color: black;
 }
 
+/* Ürün Kartları */
 .product-card {
-    background: #16213e;
+    background: black;
+    border: 2px solid gold;
     border-radius: 10px;
     padding: 20px;
-    color: white;
     text-align: center;
     transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.product-title {
-    font-size: 24px;
-    margin-bottom: 10px;
-    font-weight: bold; /* Ürün başlığı daha kalın */
-}
-
-.product-description {
-    font-size: 16px;
-    margin: 10px 0;
 }
 
 .product-price {
     font-size: 20px;
     font-weight: bold;
-    color: #f39c12; /* Ürün fiyatı için turuncu renk */
+    color: gold;
 }
 
-.buy-button {
-    background-color: #27ae60; /* Yeşil buton rengi */
-    color: white;
+/* Butonlar */
+.buy-button, .daily-bonus-btn {
+    background-color: gold;
+    color: black;
     border: none;
     padding: 10px 15px;
     border-radius: 8px;
@@ -200,32 +174,17 @@ h1 {
     transition: background-color 0.3s, transform 0.3s;
 }
 
-.buy-button:hover {
-    background-color: #219150; /* Hover sırasında daha koyu yeşil */
-    transform: scale(1.05); /* Buton hover'da büyüsün */
-}
-
-.daily-bonus-btn {
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    padding: 15px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.daily-bonus-btn:hover {
-    background-color: #d63851;
+.buy-button:hover, .daily-bonus-btn:hover {
+    background-color: #c39400;
+    transform: scale(1.05);
 }
 
 .daily-bonus-btn:disabled {
-    background-color: #7e2936;
+    background-color: grey;
     cursor: not-allowed;
 }
 
+/* Responsive Tasarım */
 @media (max-width: 768px) {
     .dashboard {
         flex-direction: column;
@@ -248,13 +207,14 @@ h1 {
     }
 }
 
+/* Footer */
 footer {
     bottom: 0;
     left: 120px;
     width: 100%;
-    background-color: #1a1a2e;
+    background-color: black;
     padding: 10px;
     text-align: center;
     font-size: 14px;
-    color: #666;
+    color: grey;
 }

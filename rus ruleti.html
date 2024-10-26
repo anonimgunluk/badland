@@ -24,7 +24,7 @@
             .chamber {
                 width: 80px;
                 height: 80px;
-                background-color: gray;
+                background-color: #444;
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -43,10 +43,6 @@
                 padding: 15px;
                 border-radius: 8px;
                 margin: 10px;
-            }
-            .game-over {
-                background-color: red;
-                color: white;
             }
         </style>
     </head>
@@ -126,6 +122,8 @@
                         endGame();
                     }
                 } else {
+                    chambers[currentShot].style.backgroundColor = "#222"; 
+
                     if (currentTurn === 0 && target === "self") {
                         betMultiplier *= 2;
                         gameResult.textContent = "Hayatta kaldın! Bahis: " + betMultiplier + "x";
@@ -161,6 +159,7 @@
             // Oyunu bitir
             function endGame() {
                 gameOver = true;
+                chambers[bulletPosition].style.backgroundColor = "red"; 
                 selfShootButton.style.display = "none";
                 botShootButton.style.display = "none";
                 resetGameButton.style.display = "block";
@@ -187,7 +186,7 @@
                 gameOver = false;
                 betMultiplier = 1;
                 currentShot = 0;
-                chambers.forEach((chamber) => chamber.classList.remove("bullet"));
+                chambers.forEach((r=>{r.classList.remove("bullet"),r.style.backgroundColor="gray"}));
                 gameResult.textContent = "Oyuna Başlayın!";
                 betDisplay.textContent = "1x";
                 selfShootButton.style.display = "";
