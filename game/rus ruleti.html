@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>BadLand - Rus Ruleti</title>
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
-        <link rel="stylesheet" href="assets/styles.css" />
+        <link rel="stylesheet" href="../assets/styles.css" />
         <style>
             .content {
                 display: flex;
@@ -75,7 +75,6 @@
                 <button id="reset-game" style="display: none;">Yeniden Oyna</button>
             </div>
         </div>
-        <script src="assets/script.js"></script>
         <script>
             let bulletPosition = Math.floor(Math.random() * 6); // Rastgele bir kovan seçilir.
             let currentTurn = 0; // Kimin sıktığı (0: oyuncu, 1: bot)
@@ -194,5 +193,6 @@
                 resetGameButton.style.display = "none";
             });
         </script>
+        <script src="../assets/script.js"></script>
     </body>
 </html>

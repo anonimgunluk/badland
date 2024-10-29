@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="tr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>BadLand - Blackjack</title>
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="../assets/styles.css" />
+        <style>
+        .content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1;
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            gap: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 48px;
+            margin: 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ffd700;
+        }
+
+        #game {
+            display: flex;
+            top: 0;
+            width: 100%;
+            justify-content: space-between;
+            padding-bottom: 100px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            width: 100px;
+            height: 150px;
+            margin: 10px;
+            border-radius: 12px;
+            background-color: #444;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .hidden {
+            background-color: #333;
+            border: 2px dashed #999;
+        }
+
+        /* Buton Tasarımı */
+        .buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 15px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        button {
+            padding: 15px 35px;
+            margin: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        /* Responsive Tasarım */
+        @media (max-width: 600px) {
+            .content {
+                flex-direction: column;
+            }
+
+            #game {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .card {
+                width: 80px;
+                height: 120px;
+                font-size: 18px;
+            }
+        }
+        </style>
+    </head>
+    <body>
+        <div class="dashboard">
+            <div class="sidebar">
+                <div class="balance" id="coin">100$</div>
+                <ul class="menu">
+                    <li><a href="index.html" data-tab="oyunlar">Oyunlar</a></li>
+                    <li><a href="index.html" data-tab="mağaza">Mağaza</a></li>
+                    <li><a href="index.html" data-tab="işlemler">İşlemler</a></li>
+                    <li><a href="index.html" data-tab="Yardım Merkezi">Yardım</a></li>
+                </ul>
+            </div>
+
+            <div class="content">
+                <div id="game">
+                    <div>
+                        <h2>Krupiye Kartları:</h2>
+                        <div id="dealer-cards" class="card-container"></div>
+                        <div id="dealer-score">Skor: 0</div>
+                    </div>
+                    <div>
+                        <h2>Senin Kartların:</h2>
+                        <div id="player-cards" class="card-container"></div>
+                        <div id="player-score">Skor: 0</div>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="buttons">
+                <button id="hit-button" style="display: none;">Kart Al</button>
+                <button id="stand-button" style="display: none;">Dur</button>
+                <button id="new-game-button">Yeni Oyun</button>
+            </div>
+        </div>
+        <script>
+            const deck = [];
+            const playerCards = [];
+            const dealerCards = [];
+            let playerScore = 0;
+            let dealerScore = 0;
+            let isGameActive = true;
+            let playerBet = 0;
+
+            // Kart değerlerini ve türlerini oluştur
+            function createDeck() {
+                for (let i = 1; i <= 10; i++) {
+                    deck.push(i, i, i, i); // Her kart 4 kez
+                }
+            }
+
+            // Bahis al
+            function placeBet() {
+                let bet = prompt("Bahis miktarını girin:");
+
+                if (bet && !isNaN(bet) && Number(bet) > -1) {
+                    playerBet = Number(bet);
+                    updateCoins(-playerBet);
+                    addLog("loss", playerBet, "BlackJack");
+                } else {
+                    alert("Geçersiz bahis miktarı. Lütfen pozitif bir sayı girin.");
+                }
+            }
+
+            // Kartları dağıt
+            function dealCards() {
+                for (let i = 0; i < 2; i++) {
+                    playerCards.push(drawCard());
+                    dealerCards.push(drawCard());
+                }
+                updateScores();
+                render();
+            }
+
+            // Kart çek
+            function drawCard() {
+                const cardIndex = Math.floor(Math.random() * deck.length);
+                return deck.splice(cardIndex, 1)[0]; // Çekilen kartı deck'ten çıkar
+            }
+
+            // Skorları güncelle
+            function updateScores() {
+                playerScore = playerCards.reduce((a, b) => a + b, 0);
+                dealerScore = dealerCards.reduce((a, b) => a + b, 0);
+            }
+
+            // Kartları render et
+            function render() {
+                document.getElementById("player-cards").innerHTML = playerCards.map((card) => `<div class="card">${card}</div>`).join("");
+                document.getElementById("dealer-cards").innerHTML = `
+                    <div class="card">${dealerCards[0]}</div>
+                    <div class="card hidden"></div>
+                `;
+                document.getElementById("player-score").innerText = `Skor: ${playerScore}`;
+                document.getElementById("dealer-score").innerText = `Skor: ?`;
+            }
+
+            // Kart al butonuna tıklayınca
+            document.getElementById("hit-button").addEventListener("click", () => {
+                if (isGameActive) {
+                    playerCards.push(drawCard());
+                    updateScores();
+
+                    if (playerScore > 21) {  // 21'i geçtiyse kaybeder
+                        isGameActive = false;
+                        document.getElementById("new-game-button").style.display = "block";
+                        document.getElementById("hit-button").style.display = "none";
+                        document.getElementById("stand-button").style.display = "none";
+                        alert("Kaybettin! Skor 21'i geçti.");
+                    } else if (playerScore === 21) {  // 21 tam ise anında kazanır
+                        isGameActive = false;
+                        document.getElementById("new-game-button").style.display = "block";
+                        document.getElementById("hit-button").style.display = "none";
+                        document.getElementById("stand-button").style.display = "none";
+                        alert("Tebrikler! 21 yaptınız, kazandınız!");
+                        updateCoins(playerBet * 2);
+                        addLog("win", playerBet * 2, "BlackJack");
+                    }
+                    render();
+                }
+            });
+
+            // Dur butonuna tıklayınca
+            document.getElementById("stand-button").addEventListener("click", () => {
+                isGameActive = false;
+
+                // Krupiye'nin hamlesi: kartları ve skorları güncelle
+                document.getElementById("dealer-cards").innerHTML = dealerCards.map((card) => `<div class="card">${card}</div>`).join("");
+                dealerScore = dealerCards.reduce((a, b) => a + b, 0);
+                document.getElementById("dealer-score").innerText = `Skor: ${dealerScore}`;
+
+                // Krupiye oyuncunun skorunu geçene veya 21'i aşana kadar kart çeker
+                while (dealerScore < playerScore && dealerScore <= 21) {
+                    dealerCards.push(drawCard());  // Krupiye yeni kart çeker
+                    updateScores();
+                    render();
+                }
+
+                determineWinner(); // Kazananı belirle
+
+                document.getElementById("new-game-button").style.display = "block";
+            });
+
+            // Kazananı belirle
+            function determineWinner() {
+                // Gizli kartı aç
+                document.getElementById("dealer-cards").innerHTML = dealerCards.map((card) => `<div class="card">${card}</div>`).join("");
+                document.getElementById("dealer-score").innerText = `Skor: ${dealerScore}`;
+
+                if (dealerScore > 21) {
+                    updateCoins(playerBet*2);
+                    addLog("win", playerBet*2, "BlackJack");
+                    alert("Tebrikler! Kazandınız!");
+                } else if (playerScore > dealerScore) {
+                    updateCoins(playerBet*2);
+                    addLog("win", playerBet*2, "BlackJack");
+                    alert("Tebrikler! Kazandınız!");
+                } else if (playerScore < dealerScore) {
+                    alert("Krupiye kazandı!");
+                } else {
+                    updateCoins(playerBet);
+                    addLog("win", playerBet, "BlackJack");
+                    alert("Beraberlik!");
+                }
+                document.getElementById("hit-button").style.display = "none";
+                document.getElementById("stand-button").style.display = "none";
+            }
+
+            // Yeni oyun butonuna tıklayınca
+            document.getElementById("new-game-button").addEventListener("click", () => {
+                deck.length = 0;
+                playerCards.length = 0;
+                dealerCards.length = 0;
+                playerScore = 0;
+                dealerScore = 0;
+                isGameActive = true;
+                document.getElementById("new-game-button").style.display = "none";
+                document.getElementById("hit-button").style.display = "";
+                document.getElementById("stand-button").style.display = "";
+                createDeck();
+                placeBet(); // Bahis alma fonksiyonu
+                dealCards();
+            });
+        </script>
+        <script src="../assets/script.js"></script>
+    </body>
+</html>
