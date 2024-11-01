@@ -123,7 +123,7 @@ function claimDailyBonus() {
 
 // Oyun sayfasına yönlendiren fonksiyon
 function openGame(index) {
-    window.location.href = "game/" + games[index].name;
+    window.location.href = "game/" + games[index].name + ".html";
 }
 
 // Oyunları render eden fonksiyon
