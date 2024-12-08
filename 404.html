@@ -1,29 +1,55 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>BadLand - 404</title>
-        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
+        <title>BadLand - Page Not Found</title>
         <link rel="stylesheet" href="assets/styles.css" />
+        <style>
+            .error-page {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                text-align: center;
+                background: var(--gradient);
+                color: var(--secondary-color);
+            }
+
+            .error-code {
+                font-size: 6rem;
+                font-weight: bold;
+            }
+
+            .error-message {
+                font-size: 1.5rem;
+                margin: 1rem 0;
+            }
+
+            .home-btn {
+                margin-top: 2rem;
+                padding: 0.75rem 1.5rem;
+                background: var(--secondary-color);
+                color: var(--primary-color);
+                border: none;
+                border-radius: 4px;
+                text-decoration: none;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: opacity 0.3s ease;
+            }
+
+            .home-btn:hover {
+                opacity: 0.85;
+            }
+        </style>
     </head>
     <body>
-        <div class="dashboard">
-            <div class="sidebar">
-                <div class="balance" id="coin">0$</div>
-                <ul class="menu">
-                    <li><a href="index.html" data-tab="oyunlar">Oyunlar</a></li>
-                    <li><a href="index.html" data-tab="mağaza">Mağaza</a></li>
-                    <li><a href="index.html" data-tab="işlemler">İşlemler</a></li>
-                </ul>
-                <button id="dailyBonusButton" class="daily-bonus-btn">Günlük Bonus Al</button>
-            </div>
-            <div class="content">
-                <div id="storeContainer" class="store">
-                    <p>Böyle bir sayfa yok nereden uydurdun?</p>
-                </div>
-            </div>
+        <div class="error-page">
+            <div class="error-code">404</div>
+            <div class="error-message">Oops! The page you're looking for doesn't exist.</div>
+            <a href="/" class="home-btn">Go Back Home</a>
         </div>
-        <script src="assets/script.js"></script>
     </body>
 </html>

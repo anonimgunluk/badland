@@ -1,83 +1,56 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>BadLand</title>
-        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
+        <title>BadLand - Games</title>
         <link rel="stylesheet" href="assets/styles.css" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-        <script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
+        <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
     </head>
     <body>
-        <div class="dashboard">
-            <div class="sidebar">
-                <div class="balance" id="coin">0$</div>
-                <ul class="menu">
-                    <li><a href="#" data-tab="oyunlar">Oyunlar</a></li>
-                    <li><a href="#" data-tab="mağaza">Mağaza</a></li>
-                    <li><a href="#" data-tab="işlemler">İşlemler</a></li>
-                    <li><a href="#" data-tab="Yardım Merkezi">Yardım</a></li>
-                </ul>
-            </div>
-            <div class="content">
-                <h1 id="pageTitle">Oyunlar</h1>
-                <div id="gamesContainer" class="games"></div>
-                <div id="transactionsContainer" class="transactions" style="display: none;"></div>
-                <div id="storeContainer" class="store" style="display: none;">
-                    <div class="product-card">
-                        <h2 class="product-title">Günlük Bonus</h2>
-                        <p class="product-description">Her gün alabileceğiniz bonus!</p>
-                        <!--<span class="product-price">Fiyat: 10$</span>-->
-                        <button id="dailyBonusButton" class="daily-bonus-btn">Günlük Bonus Al</button>
-                    </div>
+        <header>
+            <nav class="navbar">
+                <div class="nav-left">
+                    <div class="logo">BADLAND</div>
                 </div>
-                <div id="helpContainer" class="help-section" style="display: none;">
-                    <p>BadLand platformunda nasıl oynanacağını, günlük bonusları nasıl alacağınızı ve mağazadan nasıl yararlanacağınızı öğrenmek için buradayız! Aşağıda en sık sorulan soruların cevaplarını bulabilirsiniz.</p>
-
-                    <div class="faq">
-                        <h3>1. Nasıl oynarım?</h3>
-                        <p>Oyunlara katılmak için sol taraftaki <strong>Oyunlar</strong> menüsüne tıklayın. Bu menüden dilediğiniz oyunu seçebilir ve hemen oynamaya başlayabilirsiniz.</p>
-
-                        <h3>1.a. Slot (Düşük Risk)</h3>
-                        <p>
-                            Bu oyunda bahis miktarınız otomatik olarak 10$'dır. Alttaki "Çevir" tuşuna bastığınızda bahis alınır ve makine dönmeye başlar. Eğer 2 sembol aynıysa %40 kazanç elde edersiniz, 3 sembol aynı olursa 100$
-                            kazanırsınız.
-                        </p>
-
-                        <h3>1.b. Rulet (Yüksek Risk)</h3>
-                        <p>
-                            Bu oyunda paranız 0'a düşerse ne kazanır ne de kaybedersiniz. Bahis miktarınız tüm paranızdır. Bot ile oynayacağınız bu oyunda, 6 kovanlı bir rulet tabancasında rastgele bir kovan doludur. Amacınız dolu kovandan
-                            kaçınmak. "Kendine Sık" butonuna basarsanız, bahis çarpanı 2 katına çıkar. "Karşıya Sık" butonuna basarsanız bahis yarıya iner.
-                        </p>
-
-                        <h3>1.c. Blackjack (Düşük Risk)</h3>
-                        <p>
-                            Blackjack oyununa katılmak için "Yeni Oyun" tuşuna basarak yeni bir oyun başlatabilirsiniz. Bahis miktarını siz belirler, hatta 0$ bahis bile yapabilirsiniz. Amaç, elinizdeki kartların toplamını 21’e yaklaştırmak
-                            ancak 21’i geçmemektir.
-                        </p>
-
-                        <h3>1.d. Bonanza (Orta Risk)</h3>
-                        <p>Bu oyunda bahis miktarınız otomatik olarak 40$'dır. "Başlat" tuşuna bastığınızda oyun başlar ve kazandığınız skora göre para kazanırsınız.</p>
-
-                        <h3>1.e. BadCoin (Orta Risk)</h3>
-                        <p>Yakında Gelecek.</p>
-
-                        <h3>2. Nasıl daha fazla coin kazanabilirim?</h3>
-                        <p>Oyunları oynayarak, günlük bonuslar alarak ve mağazadaki özel tekliflerden faydalanarak daha fazla coin kazanabilirsiniz.</p>
-
-                        <h3>3. Günlük bonusu nasıl alırım?</h3>
-                        <p>Günlük bonusunuzu almak için sol menüdeki <strong>Mağaza</strong> sekmesine gidin ve <strong>Günlük Bonus Al</strong> butonuna tıklayın. Bonusunuz hemen hesabınıza eklenecektir.</p>
-
-                        <h3>4. İşlemlerim nerede görünüyor?</h3>
-                        <p>Kazandığınız veya kaybettiğiniz bahisler, tüm işlemleriniz <strong>İşlemler</strong> menüsü altında listelenmektedir. Buradan işlemlerinizi takip edebilirsiniz.</p>
+                <div class="nav-right">
+                    <div class="nav-icons">
+                        <a href="../help.html"><i class="bx bx-help-circle"></i></a>
                     </div>
+                    <div class="game-number" id="wallet">100$</div>
                 </div>
-            </div>
-        </div>
-        <footer>
-            <p>&copy; 2024 BadLand. Tüm hakları saklıdır.</p>
-        </footer>
+            </nav>
+        </header>
+
+        <main>
+            <section class="games-grid">
+                <div class="game-card">
+                    <h3>SLOT</h3>
+                    <div class="game-icon">🎰</div>
+                    <button class="play-btn">PLAY NOW</button>
+                </div>
+                <div class="game-card">
+                    <h3>BLACKJACK</h3>
+                    <div class="game-icon">♠️</div>
+                    <button class="play-btn">PLAY NOW</button>
+                </div>
+                <div class="game-card">
+                    <h3>ROULETTE</h3>
+                    <div class="game-icon">🛞</div>
+                    <button class="play-btn">PLAY NOW</button>
+                </div>
+                <div class="game-card">
+                    <h3>RUSSIAN ROULETTE</h3>
+                    <div class="game-icon">🔫</div>
+                    <button class="play-btn">PLAY NOW</button>
+                </div>
+                <div class="game-card">
+                    <h3>POKER</h3>
+                    <div class="game-icon">♥️</div>
+                    <button class="play-btn">COMING SOON</button>
+                </div>
+            </section>
+        </main>
         <script src="assets/script.js"></script>
     </body>
 </html>

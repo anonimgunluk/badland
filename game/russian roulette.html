@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>BadLand - Russian Roulette</title>
+        <link rel="stylesheet" href="../assets/styles.css" />
+        <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+        <style>
+            main {
+                background: var(--primary-color);
+                color: var(--secondary-color);
+                font-family: Arial, sans-serif;
+                display: flex; /* Ekran boyunca flex kutusu oluştur */
+                justify-content: center; /* Yatayda ortalar */
+                align-items: center; /* Dikeyde ortalar */
+                height: calc(100vh - 60px); /* Tam ekran yüksekliği */
+                margin: 0; /* Varsayılan boşlukları kaldırır */
+                text-align: center;
+            }
+
+            /* Tabanca tasarımı */
+            .gun-barrel {
+                position: relative;
+                width: 200px;
+                height: 200px;
+                background: #444;
+                border-radius: 50%; /* Daire yapar */
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 20px auto;
+                box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+            }
+
+            /* Altıgen tasarımı */
+            .hexagon {
+                position: absolute;
+                width: 50px;
+                height: 50px;
+                background: #ccc;
+                clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+            }
+
+            /* Odacıkların konumları */
+            #chamber1 {
+                top: 5%;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            #chamber2 {
+                top: 22%;
+                left: 25%;
+                transform: translateX(-50%);
+            }
+
+            #chamber3 {
+                top: 52%;
+                left: 25%;
+                transform: translateX(-50%);
+            }
+
+            #chamber4 {
+                top: 70%;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            #chamber5 {
+                top: 52%;
+                left: 75%;
+                transform: translateX(-50%);
+            }
+
+            #chamber6 {
+                top: 22%;
+                left: 75%;
+                transform: translateX(-50%);
+            }
+
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 1rem;
+                background: var(--gradient);
+                color: var(--secondary-color);
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background 0.3s ease;
+            }
+
+            .btn:hover {
+                background: var(--secondary-color);
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <nav class="navbar">
+                <div class="nav-left">
+                    <a href="/"><div class="logo">BADLAND</div></a>
+                </div>
+                <div class="nav-right">
+                    <div class="nav-icons">
+                        <a href="../help.html"><i class="bx bx-help-circle"></i></a>
+                    </div>
+                    <div class="game-number" id="wallet">100$</div>
+                </div>
+            </nav>
+        </header>
+
+        <main>
+            <div class="slot-container">
+                <div class="gun-barrel">
+                    <div class="hexagon" id="chamber1"></div>
+                    <div class="hexagon" id="chamber2"></div>
+                    <div class="hexagon" id="chamber3"></div>
+                    <div class="hexagon" id="chamber4"></div>
+                    <div class="hexagon" id="chamber5"></div>
+                    <div class="hexagon" id="chamber6"></div>
+                </div>
+                <div class="controls">
+                    <button class="btn" id="shoot-btn">SHOOT</button>
+                    <button class="btn" id="stay-btn">STAY</button>
+                </div>
+            </div>
+        </main>        
+
+        <script>
+            const walletElement = document.getElementById("wallet");
+            const shootButton = document.getElementById("shoot-btn");
+            const stayButton = document.getElementById("stay-btn");
+            const chambers = [
+                document.getElementById("chamber1"),
+                document.getElementById("chamber2"),
+                document.getElementById("chamber3"),
+                document.getElementById("chamber4"),
+                document.getElementById("chamber5"),
+                document.getElementById("chamber6"),
+            ];
+
+            let bulletPosition = Math.floor(Math.random() * chambers.length); // Kurşunun rastgele konumu
+            let currentChamber = 0; // Şu anki odacık
+            let currentReward = 10; // Başlangıç ödülü
+            let gameOver = false;
+
+            // Tetiği çekme işlemi
+            shootButton.addEventListener("click", async () => {
+                if (gameOver) {
+                    window.location.reload();
+                    return;
+                }
+
+                // Mevcut odacık kontrolü
+                chambers.forEach((chamber, index) => {
+                    chamber.style.background = index === currentChamber ? "#888" : "#ccc"; // Görsel vurgulama
+                });
+
+                if (currentChamber === bulletPosition) {
+                    chambers[currentChamber].style.background = "red"; // Kurşunun olduğu odacığı kırmızı yap
+                    let balance = 0;
+                    await setChip(balance);
+                    walletElement.textContent = `${balance}₺`;
+                    gameOver = true;
+                    return;
+                }
+
+                // Hayatta kalma durumu
+                chambers[currentChamber].style.background = "green"; // Güvenli odacığı yeşil yap
+                currentReward *= 2; // Ödül ikiye katlanır
+
+                currentChamber = (currentChamber + 1) % chambers.length; // Sonraki odacık
+            });
+
+            // Kalma işlemi
+            stayButton.addEventListener("click", async () => {
+                if (gameOver) {
+                    alert("Oyun bitti! Yeniden başlatmak için sayfayı yenileyin.");
+                    return;
+                }
+
+                let balance = await getChip();
+                balance += currentReward; // Ödülü ekle
+                await setChip(balance);
+                walletElement.textContent = `${balance}₺`;
+
+                alert(`Oyunu bıraktınız! Kazandığınız toplam ödül: ${currentReward}₺`);
+                gameOver = true;
+            });
+
+            // Sayfa yüklendiğinde cüzdan kontrolü
+            (async () => {
+                let balance = await getChip();
+                walletElement.textContent = `${balance}₺`;
+            })();
+
+        </script>
+        <script src="../assets/script.js"></script>
+    </body>
+</html>
